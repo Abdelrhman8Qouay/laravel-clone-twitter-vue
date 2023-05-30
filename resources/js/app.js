@@ -21,3 +21,9 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+
+
+// format number Function
+function formatNumber() {
+    console.log('Say Hello Format Number');
+}

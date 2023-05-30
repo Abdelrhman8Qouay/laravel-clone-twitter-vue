@@ -40,3 +40,12 @@ to run the project >>
     php artisan serve ( to run only the server-side of backend of laravel with this command )
 
 npm i vue-material-design-icons ( to install the material-design-icons of vue package )
+
+npm i pinia pinia-plugin-presistedstate ( install pinia with inertia js )
+
+npm i @vueuse/core ( install the vueuse to make the infinite scrolling loading )
+
+
+## Visited Important Sites For Important Points in the project
+
+A Quick Vue 3 Infinite Scrolling Component ( https://learnvue.co/articles/vue-infinite-scrolling ) {while scrolling it get rendering for more posts for the user}

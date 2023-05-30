@@ -1,50 +1,76 @@
-<script setup>
-import { ref, onMounted } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
-
-import TwitterLogo from "vue-material-design-icons/Twitter.vue";
-import LeftPages from "@/Layouts/LeftPages.vue";
-import MiddlePage from "@/Layouts/MiddlePage.vue";
-import RightPage from "@/Layouts/RightPage.vue";
-
-// For Loading Page with Animation
-const hasLoaded = ref(false);
-onMounted(() => {
-  // for Loading the page of application
-  document.onreadystatechange = () => {
-    if (document.readyState == "complete") {
-      hasLoaded.value = true;
-    }
-  };
-});
-</script>
-
 <template>
-  <div
-    v-if="!hasLoaded"
-    class="bg-black w-screen h-screen flex justify-center items-center"
-  >
-    <TwitterLogo fillColor="#1d9bf0" :size="65" />
-  </div>
-  <div v-else>
-    <Head title="Home\Twitter" />
+    <main>
+        <LayoutTwitter searchinput="false" pagetitle="Home/Twitter" pagename="Home">
+            <!-- Content Slot Here -->
+            <template #content>
+                <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
+                    <!-- Header Content -->
+                    <HeaderMain>
+                        <LinkHeaderLayout pagecompare="/" title="for you" />
+                        <LinkHeaderLayout pagecompare="/following" title="Following" />
+                    </HeaderMain>
+                    <!-- New Post Tweet -->
+                    <NewTweetaGround />
+                    <!-- All Posts -->
+                    <Tweeta v-for="(post, i) in posts" :key="i" :tweet="post" :scrolling="currentScroll" />
+                    <!-- Loader Section -->
+                    <div v-show="loaderShow" class="w-full h-max p-3 flex justify-center items-center">
+                        <LoaderFloating :showing="loaderShow" floating="false" />
+                    </div>
+                </div>
+            </template>
+        </LayoutTwitter>
+    </main>
 
-    <div class="content flex flex-row relative">
-      <LeftPages v-once></LeftPages>
-      <MiddlePage></MiddlePage>
-      <RightPage ishereSearchBox="true"></RightPage>
-    </div>
-  </div>
+    <!-- Loader Floating Section -->
+    <LoaderFloating v-show="loaderFloatShow" floating="true" />
 </template>
 
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+<script setup>
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { getPosts } from '@/Modules/utilities';
+import { useInfiniteScroll } from '@vueuse/core';
 
-* {
-  font-family: "Roboto", sans-serif;
+import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
+import HeaderMain from "@/Components/HeaderMain.vue";
+import NewTweetaGround from "@/Components/NewTweetaGround.vue";
+import Tweeta from "@/Components/Tweeta.vue";
+import LoaderFloating from "@/Components/LoaderFloating.vue";
+
+import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
+
+const loaderFloatShow = ref(false);
+
+// Scrolling with Tweet Component
+const currentScroll = ref(null);
+
+
+// Get Posts And Create
+const posts = ref(getPosts(10));
+const scrollComponent = ref(null);
+// Force Render Components
+const loaderShow = ref(false);
+const loadMorePosts = async () => {
+    loaderShow.value = true;
+    await new Promise((res) => setTimeout(res, 1200));
+    let newPosts = getPosts(10);
+    loaderShow.value = false;
+    posts.value.push(...newPosts);
+}
+onMounted(() => whenScroll());
+// function while scrolling to (parent of tweets)
+const whenScroll = function () {
+    // make a promise to get the parent of tweets (because it inside the template and had not created yet)
+    Promise.resolve().then(() => {
+        // use infinity scroll to get more tweets
+        useInfiniteScroll(scrollComponent.value, async () => await loadMorePosts(), { distance: 10 });
+        // give the tweet component the current scroll value
+        // scrollComponent.value.addEventListener('scroll', () => {
+        //     currentScroll.value = scrollComponent.value.scrollTop;
+        // });
+    })
 }
 
-body {
-  background: #000;
-}
-</style>
+</script>
+
+<style></style>
