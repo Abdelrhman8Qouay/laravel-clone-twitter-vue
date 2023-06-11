@@ -12,7 +12,7 @@
                     <!-- New Post Tweet -->
                     <NewTweetaGround />
                     <!-- All Posts -->
-                    <Tweeta v-for="(post, i) in posts" :key="i" :tweet="post" :scrolling="currentScroll" />
+                    <Tweeta v-for="(post, i) in tweets" :key="i" :tweet="post" :scrolling="currentScroll" />
                     <!-- Loader Section -->
                     <div v-show="loaderShow" class="w-full h-max p-3 flex justify-center items-center">
                         <LoaderFloating :showing="loaderShow" floating="false" />
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, nextTick, defineProps } from "vue";
 import { getPosts } from '@/Modules/utilities';
 import { useInfiniteScroll } from '@vueuse/core';
 
@@ -46,30 +46,31 @@ const currentScroll = ref(null);
 
 
 // Get Posts And Create
-const posts = ref(getPosts(10));
-const scrollComponent = ref(null);
-// Force Render Components
-const loaderShow = ref(false);
-const loadMorePosts = async () => {
-    loaderShow.value = true;
-    await new Promise((res) => setTimeout(res, 1200));
-    let newPosts = getPosts(10);
-    loaderShow.value = false;
-    posts.value.push(...newPosts);
-}
-onMounted(() => whenScroll());
-// function while scrolling to (parent of tweets)
-const whenScroll = function () {
-    // make a promise to get the parent of tweets (because it inside the template and had not created yet)
-    Promise.resolve().then(() => {
-        // use infinity scroll to get more tweets
-        useInfiniteScroll(scrollComponent.value, async () => await loadMorePosts(), { distance: 10 });
-        // give the tweet component the current scroll value
-        // scrollComponent.value.addEventListener('scroll', () => {
-        //     currentScroll.value = scrollComponent.value.scrollTop;
-        // });
-    })
-}
+defineProps({ tweets: Array })
+// const posts = ref(getPosts(10));
+// const scrollComponent = ref(null);
+// // Force Render Components
+// const loaderShow = ref(false);
+// const loadMorePosts = async () => {
+//     loaderShow.value = true;
+//     await new Promise((res) => setTimeout(res, 1200));
+//     let newPosts = getPosts(10);
+//     loaderShow.value = false;
+//     posts.value.push(...newPosts);
+// }
+// onMounted(() => whenScroll());
+// // function while scrolling to (parent of tweets)
+// const whenScroll = function () {
+//     // make a promise to get the parent of tweets (because it inside the template and had not created yet)
+//     Promise.resolve().then(() => {
+//         // use infinity scroll to get more tweets
+//         useInfiniteScroll(scrollComponent.value, async () => await loadMorePosts(), { distance: 10 });
+//         // give the tweet component the current scroll value
+//         // scrollComponent.value.addEventListener('scroll', () => {
+//         //     currentScroll.value = scrollComponent.value.scrollTop;
+//         // });
+//     })
+// }
 
 </script>
 

@@ -16,13 +16,10 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-});
+Route::get('/', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
+Route::get('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
+Route::get('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
 
-Route::get('/about', function () {
-    return Inertia::render('About');
-});
 
 
 require __DIR__.'/auth.php';

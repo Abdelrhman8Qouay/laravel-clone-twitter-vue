@@ -26,7 +26,7 @@
                         <!-- Boxes Div -->
                         <div class="allBoxes w-full flex flex-col gap-3 my-3 overflow-y-auto">
                             <!-- what'is happening Box -->
-                            <div class="bg-[#202327] rounded-lg overflow-hidden">
+                            <div class="bg-[#202327] rounded-lg ">
                                 <span class="text-white font-bold text-lg block p-4">What’s happening</span>
                                 <div class="trendingLive h-28 hover:bg-[#d6d9db1f] p-4 flex flex-row justify-between">
                                     <div>
@@ -76,7 +76,7 @@
                             </div>
 
                             <!-- who to follow Box -->
-                            <div class="bg-[#202327] rounded-lg overflow-hidden">
+                            <div class="bg-[#202327] rounded-lg">
                                 <span class="text-white font-bold text-lg block p-4">Who to follow</span>
                                 <a href="#"
                                     class="w-full flex items-center gap-1 overflow-hidden py-2 px-3 hover:bg-[#d6d9db1f]">
@@ -154,8 +154,27 @@
                                 </a>
                             </div>
 
+                            <!-- New To Twitter Box -->
+                            <div class="bg-[#202327] rounded-lg">
+                                <span class="text-white font-bold text-lg block mb-2 p-4">New To Twitter?</span>
+                                <!-- Buttons Create -->
+                                <div class="flex justify-center items-center py-1 px-4">
+                                    <Link to="/" as="button"
+                                        class="px-4 py-2 w-full mb-2 flex justify-center items-center bg-white text-black font-semibold rounded-full">
+                                    Create account
+                                    </Link>
+                                </div>
+
+                                <!-- Policies And More -->
+                                <div class="flex flex-row flex-wrap w-full p-4">
+                                    <p class="font-extralight text-[13px] text-[#71767b] pUrl">By signing up, you
+                                        agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>,
+                                        including <a href="#">Cookie Use</a>.</p>
+                                </div>
+                            </div>
+
                             <!-- Terms Of Site Box Transparent -->
-                            <div class="flex flex-row flex-wrap w-full gap-4">
+                            <div class="flex flex-row flex-wrap w-full gap-2">
                                 <a href="#"
                                     class="font-extralight text-[13px] text-[#71767b] no-underline hover:underline">Terms of
                                     Service</a>
@@ -178,6 +197,26 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login & Signup -->
+    <div class="fixed left-0 bottom-0 w-full bg-[#1d9bf0]">
+        <div class="lg:w-8/12 w-screen mx-auto flex justify-between py-2">
+            <div class="sm:inline-block hidden">
+                <div class="text-2xl text-white font-semibold">Don’t miss what’s happening</div>
+                <div class="text-lg text-white font-semibold">People on Twitter are the first to know.</div>
+            </div>
+            <div class="flex justify-center items-center max-sm:w-full w-max gap-2">
+                <Link as="button" to="/login"
+                    class="bg-[#1d9bf0] hover:opacity-50 rounded-full px-6 py-2 text-center border border-white font-medium flex-grow font-serif">
+                log in
+                </Link>
+                <Link as="button" to="/signup"
+                    class="bg-white hover:opacity-50 rounded-full px-6 py-2 text-center font-medium flex-grow font-serif">
+                sign
+                up</Link>
             </div>
         </div>
     </div>
@@ -221,5 +260,14 @@ onBeforeMount(() => { hasLoaded.value = false })
     width: 0;
     height: 0;
     background: transparent;
+}
+
+.pUrl a {
+    text-decoration: none;
+    color: #1d9bf0;
+}
+
+.pUrl a:hover {
+    text-decoration: underline;
 }
 </style>

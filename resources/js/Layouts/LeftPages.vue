@@ -12,8 +12,10 @@
 
                 <!-- Url Lists -->
                 <Item title="Home" ico="Home" url="/mag" />
-                <Item title="Explore" ico="Pound" url="/mag" />
-                <Item title="Notifications" ico="BellOutline" url="/mag" />
+                <Item title="Explore" ico="Tag" url="/mag" />
+                <Item title="Notifications" ico="Notif" url="/mag" />
+                <Item title="Explore" ico="Explore" url="/mag" />
+                <Item title="Settings" ico="Settings" url="/mag" />
 
                 <!-- Tweet Button -->
                 <button @click="openTweet = true" type="button"

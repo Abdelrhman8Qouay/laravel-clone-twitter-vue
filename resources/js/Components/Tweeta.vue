@@ -4,9 +4,9 @@
         <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
             ref="userImageTweeta">
             <a href="#">
-                <img :src="tweet.user.image"
+                <img :src="tweet.image"
                     class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[50px] min-h-[50px]"
-                    alt="tweet.user.name" />
+                    :alt="tweet.name" />
             </a>
         </div>
         <!-- All Content of Post -->
@@ -16,14 +16,14 @@
                 <div class="flex justify-start items-center text-base truncate">
                     <div class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
                         @mouseleave="whenLeaveHover" ref="userNameTweeta">
-                        {{ tweet.user.name }}
+                        {{ tweet.name }}
                     </div>
                     <div class="Mark inline-block px-1">
                         <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
                     </div>
                     <span class="text-gray-400 font-light inline-block truncate" @mouseover="whenGoHover"
                         @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{
-                            tweet.user.handle
+                            tweet.handle
                         }}</span>
                     . <span class="text-gray-400 font-light hover:underline">7h</span>
                 </div>
@@ -114,49 +114,6 @@
     </div>
 
     <!-- Hover User Section  -->
-    <div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
-        @mouseleave="hoverSection.classList.remove('showVisible')"
-        class="w-[360px] bg-black cursor-default shadow shadow-white p-3 fixed invisible delay-700 transition duration-300 z-[12000] rounded-2xl">
-        <!-- Image & Button -->
-        <div class="flex justify-between items-start">
-            <a href="#">
-                <img :src="tweet.user.image"
-                    class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300" width="60"
-                    height="60" :alt="tweet.user.name" />
-            </a>
-            <button :class="!tweet.user.is_following ? 'bg-white text-black' : 'text-white'"
-                class="rounded-3xl w-max text-sm border border-white hover:border-red-700 hover:text-red-700 hover:bg-[#7c010c7d] py-1 px-4">
-                {{ tweet.user.is_following ? 'following' : 'follow' }}
-            </button>
-        </div>
-        <!-- User Name -->
-        <div class="text-white font-bold text-lg inline-block mb-1 leading-4">
-            {{ tweet.user.name }}
-            <div class="Mark inline-block">
-                <CheckDecagram class="inline-block" fillColor="#2563eb" :size="16" />
-            </div>
-        </div>
-        <!-- User TagName -->
-        <span class="text-gray-400 font-light text-sm truncate flex items-center mb-2">@{{ tweet.user.handle }}</span>
-        <!-- Description Text -->
-        <div class="text-white font-bold text-lg block mb-2">
-            <!-- Title -->
-            <div class="text-white text-base font-semibold">
-                {{ tweet.user.description }}
-            </div>
-            <!-- Own Website -->
-            <a href="#" class="no-underline hover:underline text-sm">qouayntQue.com</a>
-        </div>
-        <!-- Follow Flex -->
-        <div class="flex flex-row justify-start items-center gap-3 text-sm mb-2">
-            <div class="text-gray-400 font-light">
-                <span class="font-bold text-white">{{ formatNumber(tweet.user.following) }}</span> Following
-            </div>
-            <div class="text-gray-400 font-light">
-                <span class="font-bold text-white">{{ formatNumber(tweet.user.followers) }}</span> Followers
-            </div>
-        </div>
-    </div>
 </template>
 
 <script setup>
@@ -229,16 +186,61 @@ const staticMenuPost = ref([
 ]);
 
 
-const hoverSection = ref(null);
+// const hoverSection = ref(null);
 async function whenGoHover(e) {
-    hoverSection.value.style.left = `${e.target.getBoundingClientRect().x - 50}px`;
-    hoverSection.value.style.top = `${e.target.getBoundingClientRect().y + 25}px`;
-    hoverSection.value.classList.add('showVisible');
+    // hoverSection.value.style.left = `${e.target.getBoundingClientRect().x - 50}px`;
+    // hoverSection.value.style.top = `${e.target.getBoundingClientRect().y + 25}px`;
+    // hoverSection.value.classList.add('showVisible');
 }
 async function whenLeaveHover() {
-    hoverSection.value.classList.remove('showVisible');
+    // hoverSection.value.classList.remove('showVisible');
 }
 
+
+// Hover Sec
+const hovSec = `<div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
+        @mouseleave="hoverSection.classList.remove('showVisible')"
+        class="w-[360px] bg-black cursor-default shadow shadow-white p-3 fixed invisible delay-700 transition duration-300 z-[12000] rounded-2xl">
+        <!-- Image & Button -->
+        <div class="flex justify-between items-start">
+            <a href="#">
+                <img :src="tweet.image"
+                    class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300" width="60"
+                    height="60" :alt="tweet.user.name" />
+            </a>
+            <button :class="!tweet.user.is_following ? 'bg-white text-black' : 'text-white'"
+                class="rounded-3xl w-max text-sm border border-white hover:border-red-700 hover:text-red-700 hover:bg-[#7c010c7d] py-1 px-4">
+                {{ tweet.user.is_following ? 'following' : 'follow' }}
+            </button>
+        </div>
+        <!-- User Name -->
+        <div class="text-white font-bold text-lg inline-block mb-1 leading-4">
+            {{ tweet.user.name }}
+            <div class="Mark inline-block">
+                <CheckDecagram class="inline-block" fillColor="#2563eb" :size="16" />
+            </div>
+        </div>
+        <!-- User TagName -->
+        <span class="text-gray-400 font-light text-sm truncate flex items-center mb-2">@{{ tweet.user.handle }}</span>
+        <!-- Description Text -->
+        <div class="text-white font-bold text-lg block mb-2">
+            <!-- Title -->
+            <div class="text-white text-base font-semibold">
+                {{ tweet.user.description }}
+            </div>
+            <!-- Own Website -->
+            <a href="#" class="no-underline hover:underline text-sm">qouayntQue.com</a>
+        </div>
+        <!-- Follow Flex -->
+        <div class="flex flex-row justify-start items-center gap-3 text-sm mb-2">
+            <div class="text-gray-400 font-light">
+                <span class="font-bold text-white">{{ formatNumber(tweet.user.following) }}</span> Following
+            </div>
+            <div class="text-gray-400 font-light">
+                <span class="font-bold text-white">{{ formatNumber(tweet.user.followers) }}</span> Followers
+            </div>
+        </div>
+    </div>`
 </script>
 
 

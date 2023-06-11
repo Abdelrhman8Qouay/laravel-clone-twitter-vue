@@ -46,6 +46,15 @@ npm i pinia pinia-plugin-presistedstate ( install pinia with inertia js )
 npm i @vueuse/core ( install the vueuse to make the infinite scrolling loading )
 
 
+## Commands Used To Database
+
+php artisan make:model Tweet -cm --resource ( make a model for tweet with resource )
+
+php artisan make:seeder Tweet TweetsSeeder ( make a seeder for testing tweets of the site )
+
+php artisan migrate:fresh ( to migrate the tables in the database if not exist and if exist drop it and re-run again )
+
+php artisan db:seed ( to insert the fake data to the database with seeding them )
 ## Visited Important Sites For Important Points in the project
 
 A Quick Vue 3 Infinite Scrolling Component ( https://learnvue.co/articles/vue-infinite-scrolling ) {while scrolling it get rendering for more posts for the user}
