@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex overflow-hidden max-[512px]:hidden border-b border-b-slate-500 p-2">
+    <div class="w-full flex overflow-hidden max-[512px]:hidden border-b border-b-slate-500 p-2" v-if="check_auth">
         <!-- Image User Avatar -->
         <div class="w-[51px] max-h-[51px] mr-3 relative group">
             <a href="#">
@@ -173,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps } from "vue";
 
 import Close from "vue-material-design-icons/Close.vue";
 import ArrowLeft from "vue-material-design-icons/ArrowLeft.vue";
@@ -189,6 +189,8 @@ import MapMarkerOutline from "vue-material-design-icons/MapMarkerOutline.vue";
 
 import AccountTag from "vue-material-design-icons/AccountTag.vue";
 import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
+
+defineProps({ check_auth: Boolean })
 
 // Tweet Overlay
 const activeHover = ref(false);

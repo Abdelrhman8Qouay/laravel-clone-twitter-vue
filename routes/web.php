@@ -17,9 +17,13 @@ use Inertia\Inertia;
 */
 
 Route::get('/', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
-Route::get('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
-Route::get('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
+Route::post('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
+Route::delete('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 require __DIR__.'/auth.php';

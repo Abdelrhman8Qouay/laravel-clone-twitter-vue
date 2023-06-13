@@ -9,7 +9,7 @@
         <div class="w-full relative">
             <div class="max-w-[1400px] mx-auto flex">
                 <!-- Left Part -->
-                <LeftPages v-once></LeftPages>
+                <LeftPages :user_auth="user_auth" :check_auth="check_auth" v-once></LeftPages>
                 <!-- Middle Part -->
                 <div class="lg:w-[52%] max-[512px]:w-full w-11/12 h-screen border-r border-r-slate-500 relative">
                     <div class="middleS h-full">
@@ -155,13 +155,15 @@
                             </div>
 
                             <!-- New To Twitter Box -->
-                            <div class="bg-[#202327] rounded-lg">
-                                <span class="text-white font-bold text-lg block mb-2 p-4">New To Twitter?</span>
+                            <div class="bg-[#202327] rounded-lg" v-if="!check_auth">
+                                <span class="text-white font-bold text-lg block px-4 pt-4">New To Twitter?</span>
+                                <p class="mb-2 px-4 font-extralight text-[13px] text-[#71767b]">Sign up now to get your own
+                                    personalized timeline!</p>
                                 <!-- Buttons Create -->
                                 <div class="flex justify-center items-center py-1 px-4">
-                                    <Link to="/" as="button"
+                                    <Link :href="route('register')" as="button"
                                         class="px-4 py-2 w-full mb-2 flex justify-center items-center bg-white text-black font-semibold rounded-full">
-                                    Create account
+                                    Create account {{ check_auth }}
                                     </Link>
                                 </div>
 
@@ -202,18 +204,18 @@
     </div>
 
     <!-- Login & Signup -->
-    <div class="fixed left-0 bottom-0 w-full bg-[#1d9bf0]">
+    <div class="fixed left-0 bottom-0 w-full bg-[#1d9bf0]" v-if="!check_auth">
         <div class="lg:w-8/12 w-screen mx-auto flex justify-between py-2">
             <div class="sm:inline-block hidden">
                 <div class="text-2xl text-white font-semibold">Don’t miss what’s happening</div>
                 <div class="text-lg text-white font-semibold">People on Twitter are the first to know.</div>
             </div>
             <div class="flex justify-center items-center max-sm:w-full w-max gap-2">
-                <Link as="button" to="/login"
+                <Link as="button" :href="route('login')"
                     class="bg-[#1d9bf0] hover:opacity-50 rounded-full px-6 py-2 text-center border border-white font-medium flex-grow font-serif">
                 log in
                 </Link>
-                <Link as="button" to="/signup"
+                <Link as="button" :href="route('register')"
                     class="bg-white hover:opacity-50 rounded-full px-6 py-2 text-center font-medium flex-grow font-serif">
                 sign
                 up</Link>
@@ -237,8 +239,10 @@ const props = defineProps({
     searchinput: Boolean,
     pagetitle: String,
     pagename: String,
+    user_auth: Array,
+    check_auth: Boolean,
 })
-const { searchinput, pagetitle, pagename } = toRefs(props);
+const { searchinput, pagetitle, pagename, user_auth, check_auth } = toRefs(props);
 
 // For Loading Page with Animation
 const hasLoaded = ref(false);

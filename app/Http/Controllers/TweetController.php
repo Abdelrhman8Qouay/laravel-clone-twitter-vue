@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tweet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,7 +15,9 @@ class TweetController extends Controller
     public function index()
     {
         return Inertia::render('Welcome', [
-            'tweets' => Tweet::orderBy('id', 'desc')->get()
+            'tweets' => Tweet::orderBy('id', 'desc')->get(),
+            'check_auth' => auth()->check(),
+            'user_auth' => auth()->user(),
         ]);
     }
 
@@ -31,7 +34,36 @@ class TweetController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $file = null;
+        $extension = null;
+        $fileName = null;
+        $path = '';
+        $imageTypes = array("png", "gif", "jpg", "jpeg", "webm", "webp");
+
+        if($request->hasFile('file')) {
+            $file = $request->file('file');
+            $request->validate(['file' => 'required|mimes:jpg,jpeg,png,gif,mp4,mov,wmv,avi,avchd,flv,f4v,swf,mkv,webm,html5,mpeg-2,webp']);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '.' . $extension;
+            in_array($extension, $imageTypes) ? $path = '/uploads/posts/videos/' : $path = '/uploads/posts/pics/';
+        }
+
+        $tweet = new Tweet;
+
+        $tweet->tweet = $request->input('tweet');
+        $tweet->visible = $request->input('visible');
+        $tweet->user_id = $request->input('user_id');
+        if($fileName) {
+            $tweet->file = $path . $fileName;
+            $tweet->is_video = in_array($extension, $imageTypes) ? false : true;
+            $file->move(public_path() . $path, $fileName);
+        }
+        $tweet->comments = 0;
+        $tweet->retweets = 0;
+        $tweet->likes = 0;
+        $tweet->analytics = 0;
+
+        $tweet->save();
     }
 
     /**
@@ -61,8 +93,16 @@ class TweetController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tweet $tweet)
+    public function destroy($id)
     {
-        //
+        $tweet = Tweet::find($id);
+
+        if (!is_null($tweet->file) && file_exists(public_path() . $tweet->file)) {
+            unlink(public_path() . $tweet->file);
+        }
+
+        $tweet->delete();
+
+        return redirect()->route('tweets.index');
     }
 }

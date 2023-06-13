@@ -13,17 +13,16 @@ return new class extends Migration
     {
         Schema::create('tweets', function (Blueprint $table) {
             $table->id();
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->string('name');
-            $table->string('image');
-            $table->string('handle');
             $table->text('tweet');
             $table->string('file')->nullable();
             $table->boolean('is_video')->nullable();
+            $table->enum('visible', [0, 1, 2])->default(0);
             $table->integer('comments');
             $table->integer('retweets');
             $table->integer('likes');
             $table->integer('analytics');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

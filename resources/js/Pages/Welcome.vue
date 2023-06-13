@@ -1,6 +1,9 @@
 <template>
     <main>
-        <LayoutTwitter searchinput="false" pagetitle="Home/Twitter" pagename="Home">
+        <div class="text-white" v-if="check_auth">Auth_User: {{ user_auth.name }}</div>
+        <div class="text-red-500" v-else>No Auth User</div>
+        <LayoutTwitter searchinput="false" pagetitle="Home/Twitter" pagename="Home" :user_auth="user_auth"
+            :check_auth="check_auth">
             <!-- Content Slot Here -->
             <template #content>
                 <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
@@ -10,7 +13,7 @@
                         <LinkHeaderLayout pagecompare="/following" title="Following" />
                     </HeaderMain>
                     <!-- New Post Tweet -->
-                    <NewTweetaGround />
+                    <NewTweetaGround :check_auth="check_auth" />
                     <!-- All Posts -->
                     <Tweeta v-for="(post, i) in tweets" :key="i" :tweet="post" :scrolling="currentScroll" />
                     <!-- Loader Section -->
@@ -46,7 +49,7 @@ const currentScroll = ref(null);
 
 
 // Get Posts And Create
-defineProps({ tweets: Array })
+defineProps({ tweets: Array, user_auth: Array, check_auth: Boolean })
 // const posts = ref(getPosts(10));
 // const scrollComponent = ref(null);
 // // Force Render Components
