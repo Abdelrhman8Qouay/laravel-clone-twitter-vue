@@ -31,18 +31,16 @@
                     class="block w-max p-1 float-right hover:bg-[#0199ff1f] rounded-full group relative">
                     <DotsHorizontal class="fill-white stroke-[#71767b] group-hover:stroke-[#2563eb]" fillColor="none"
                         :size="22" />
-                    <div :class="clickedMenu ? 'flex' : 'hidden'" @focusout="clickedMenu = false"
-                        class="menuPost z-[12000] w-max min-[513px]:absolute min-[513px]:left-0 min-[513px]:top-0 max-[512px]:fixed max-[512px]:z-[10000] max-[512px]:left-0 max-[512px]:bottom-0 max-[512px]:w-full max-[512px]:rounded-none bg-black shadow shadow-white flex-col rounded-3xl">
-                        <div v-for="(menu, i) in staticMenuPost" :key="i" role="menuitem" tabindex="0"
-                            class="p-4 flex items-center">
-                            <div class="inline-block mx-2 text-white">
-                                <component :is="menu.component" class="inline-block" fillColor="#fff" :size="19" />
-                            </div>
-                            <div class="text-white font-bold inline-block text-sm">
-                                {{ menu.title }}
-                            </div>
+                        <div class="absolute left-[-20%] top-full py-2 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
+                            style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifTweetMenu">
+                            <Link as="button" method="delete" :href="route('tweets.destroy', {id: tweet.id})" tabindex="0"
+                                class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
+                                <div class="p-2 inline-block">
+                                    <TrashCanOutline fillColor="#f4212e" :size="21" />
+                                </div>
+                                Delete
+                            </Link>
                         </div>
-                    </div>
                 </div>
             </div>
             <!-- Comment post Div -->
@@ -139,6 +137,7 @@ import Sync from "vue-material-design-icons/Sync.vue";
 import HeartOutline from "vue-material-design-icons/HeartOutline.vue";
 import ChartBar from "vue-material-design-icons/ChartBar.vue";
 import Share from "vue-material-design-icons/Share.vue";
+import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
 
 import Close from "vue-material-design-icons/Close.vue";
 
@@ -146,6 +145,8 @@ import Close from "vue-material-design-icons/Close.vue";
 const props = defineProps({ tweet: Object });
 const { tweet } = toRefs(props);
 
+
+const ifTweetMenu = ref(false);
 
 // Control Image
 const openShow = ref(false);

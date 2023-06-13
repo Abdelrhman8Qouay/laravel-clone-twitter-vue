@@ -45,7 +45,7 @@ class TweetController extends Controller
             $request->validate(['file' => 'required|mimes:jpg,jpeg,png,gif,mp4,mov,wmv,avi,avchd,flv,f4v,swf,mkv,webm,html5,mpeg-2,webp']);
             $extension = $file->getClientOriginalExtension();
             $fileName = time() . '.' . $extension;
-            in_array($extension, $imageTypes) ? $path = '/uploads/posts/videos/' : $path = '/uploads/posts/pics/';
+            in_array($extension, $imageTypes) ? $path = '/uploads/posts/pics/' : $path = '/uploads/posts/videos/';
         }
 
         $tweet = new Tweet;

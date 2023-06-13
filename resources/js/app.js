@@ -23,7 +23,3 @@ createInertiaApp({
 });
 
 
-// format number Function
-function formatNumber() {
-    console.log('Say Hello Format Number');
-}

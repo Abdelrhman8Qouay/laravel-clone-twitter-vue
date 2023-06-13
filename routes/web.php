@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+// use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,7 +20,10 @@ Route::get('/', [\App\Http\Controllers\TweetController::class, 'index'])->name('
 Route::post('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
 Route::delete('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
 
+
+
 Route::middleware('auth')->group(function () {
+    Route::get('/profile/{name}', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

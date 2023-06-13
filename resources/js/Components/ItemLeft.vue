@@ -1,5 +1,5 @@
 <template >
-    <Link as="button" :href="route('register')"
+    <Link as="button"
         class="hover:bg-[#d6d9db1f] rounded-full my-2 p-2 w-max flex items-center justify-center transition transition-200">
     <component :is="IconStr" fillColor="#fff" class="inline-block" :size="30" />
     <span :class="ico === 'Home' ? 'font-bold' : 'font-light'"

@@ -15,7 +15,7 @@
                 <Item title="Explore" ico="Tag" url="/mag" />
                 <Item title="Explore" ico="Explore" url="/mag" v-if="check_auth" />
                 <Item title="Notifications" ico="Notif" url="/mag" v-if="check_auth" />
-                <Item title="Profile" ico="Account" url="/register" v-if="check_auth" />
+                <Item title="Profile" ico="Account" v-if="check_auth" />
                 <Item title="Settings" ico="Settings" url="/mag" />
 
                 <!-- Tweet Button -->
