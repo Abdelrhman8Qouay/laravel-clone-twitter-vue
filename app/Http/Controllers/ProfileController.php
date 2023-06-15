@@ -14,14 +14,6 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
-     * Display the specified resource.
-     */
-    public function show($name)
-    {
-        //
-    }
-
-    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): Response

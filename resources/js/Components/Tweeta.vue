@@ -3,44 +3,47 @@
         <!-- Image User Avatar -->
         <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
             ref="userImageTweeta">
-            <a href="#">
-                <img :src="tweet.image"
-                    class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[50px] min-h-[50px]"
-                    :alt="tweet.name" />
-            </a>
+            <Link :href="route('profiling.index', { name: tweet.user.name })">
+            <img :src="tweet.user.avatar"
+                class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[45px] min-h-[45px]"
+                :alt="tweet.name" />
+            </Link>
         </div>
         <!-- All Content of Post -->
         <div class="w-[calc(100%-55px)] flex-1 h-full mx-1">
             <!-- Title Top -->
             <div class="flex flex-row justify-between items-center w-full">
                 <div class="flex justify-start items-center text-base truncate">
-                    <div class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
+                    <Link :href="route('profiling.index', { name: tweet.user.name })"
+                        class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
                         @mouseleave="whenLeaveHover" ref="userNameTweeta">
-                        {{ tweet.name }}
-                    </div>
-                    <div class="Mark inline-block px-1">
+                    {{ tweet.user.name }}
+                    </Link>
+                    <div class="Mark inline-block pl-2" v-if="tweet.user.blue_mark">
                         <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
                     </div>
-                    <span class="text-gray-400 font-light inline-block truncate" @mouseover="whenGoHover"
-                        @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{
-                            tweet.handle
-                        }}</span>
-                    . <span class="text-gray-400 font-light hover:underline">7h</span>
+                    <Link :href="route('profiling.index', { name: tweet.user.name })"
+                        class="text-gray-400 font-light inline-block truncate pl-2" @mouseover="whenGoHover"
+                        @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{ tweet.user.handle_name }}
+                    </Link>
+                    <span class="px-2 text-gray-400">.</span>
+                    <span class="text-gray-400 font-light hover:underline">{{ betweenTime(tweet.created_at) }}</span>
                 </div>
-                <div @click="clickedMenu = !clickedMenu"
+                <div @click="ifTweetMenu = !ifTweetMenu"
                     class="block w-max p-1 float-right hover:bg-[#0199ff1f] rounded-full group relative">
                     <DotsHorizontal class="fill-white stroke-[#71767b] group-hover:stroke-[#2563eb]" fillColor="none"
                         :size="22" />
-                        <div class="absolute left-[-20%] top-full py-2 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
-                            style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifTweetMenu">
-                            <Link as="button" method="delete" :href="route('tweets.destroy', {id: tweet.id})" tabindex="0"
-                                class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
-                                <div class="p-2 inline-block">
-                                    <TrashCanOutline fillColor="#f4212e" :size="21" />
-                                </div>
-                                Delete
-                            </Link>
+                    <div class="absolute right-1/4 top-full py-1 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
+                        style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifTweetMenu">
+                        <Link as="button" method="delete" :href="route('tweets.destroy', { id: tweet.id })" tabindex="0"
+                            v-if="tweet.user.name === user_auth.name && tweet.user.id === user_auth.id"
+                            class="px-2 py-2 text-white text-sm font-bold bg-black flex justify-start items-center gap-2 relative">
+                        <div class="p-2 px-1 inline-block">
+                            <TrashCanOutline fillColor="#f4212e" :size="21" />
                         </div>
+                        Delete
+                        </Link>
+                    </div>
                 </div>
             </div>
             <!-- Comment post Div -->
@@ -112,102 +115,14 @@
     </div>
 
     <!-- Hover User Section  -->
-</template>
-
-<script setup>
-import { ref, defineProps, toRefs, onMounted, nextTick } from "vue";
-import { formatNumber } from '@/Modules/utilities';
-
-import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
-import DotsHorizontal from "vue-material-design-icons/DotsHorizontal.vue";
-
-import EmoticonSadOutline from "vue-material-design-icons/EmoticonSadOutline.vue";
-import AccountRemove from "vue-material-design-icons/AccountRemove.vue";
-import AccountPlus from "vue-material-design-icons/AccountPlus.vue";
-import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
-import VolumeMute from "vue-material-design-icons/VolumeMute.vue";
-import BlockHelper from "vue-material-design-icons/BlockHelper.vue";
-import CodeLessThan from "vue-material-design-icons/CodeLessThan.vue";
-import AlertOctagonOutline from "vue-material-design-icons/AlertOctagonOutline.vue";
-import ChatRemoveOutline from "vue-material-design-icons/ChatRemoveOutline.vue";
-import HelpCircleOutline from "vue-material-design-icons/HelpCircleOutline.vue";
-
-import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
-import Sync from "vue-material-design-icons/Sync.vue";
-import HeartOutline from "vue-material-design-icons/HeartOutline.vue";
-import ChartBar from "vue-material-design-icons/ChartBar.vue";
-import Share from "vue-material-design-icons/Share.vue";
-import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
-
-import Close from "vue-material-design-icons/Close.vue";
-
-
-const props = defineProps({ tweet: Object });
-const { tweet } = toRefs(props);
-
-
-const ifTweetMenu = ref(false);
-
-// Control Image
-const openShow = ref(false);
-
-
-// Control Video
-const hoverVideo = ref(false);
-
-// const videoContainer = ref(null);
-// onMounted(() => {
-//     let options = {
-//         root: null,
-//         rootMargin: '0px',
-//         threshold: 1.0,
-//     };
-//     let callback = (entries, observer) => {
-//         entries.forEach(entry => {
-//             if (entry.isIntersecting) {
-//                 entry.target.play();
-//             } else {
-//                 entry.target.pause();
-//             }
-//         });
-//     }
-//     let observer = new IntersectionObserver(callback, options);
-//     observer.observe(document.querySelector('.videoContainer'));
-// })
-
-
-// For Menus
-const clickedMenu = ref(false);
-const staticMenuPost = ref([
-    { component: EmoticonSadOutline, title: "Not Interested In This Tweet" },
-    { component: ListBoxOutline, title: "Add/Remove @Quaynt from Lists" },
-    { component: VolumeMute, title: "Mute @Quaynt" },
-    { component: BlockHelper, title: "Block @Quaynt" },
-    { component: CodeLessThan, title: "Embed Tweet" },
-]);
-
-
-// const hoverSection = ref(null);
-async function whenGoHover(e) {
-    // hoverSection.value.style.left = `${e.target.getBoundingClientRect().x - 50}px`;
-    // hoverSection.value.style.top = `${e.target.getBoundingClientRect().y + 25}px`;
-    // hoverSection.value.classList.add('showVisible');
-}
-async function whenLeaveHover() {
-    // hoverSection.value.classList.remove('showVisible');
-}
-
-
-// Hover Sec
-const hovSec = `<div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
+    <div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
         @mouseleave="hoverSection.classList.remove('showVisible')"
         class="w-[360px] bg-black cursor-default shadow shadow-white p-3 fixed invisible delay-700 transition duration-300 z-[12000] rounded-2xl">
         <!-- Image & Button -->
         <div class="flex justify-between items-start">
             <a href="#">
-                <img :src="tweet.image"
-                    class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300" width="60"
-                    height="60" :alt="tweet.user.name" />
+                <img :src="tweet.image" class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300"
+                    width="60" height="60" :alt="tweet.user.name" />
             </a>
             <button :class="!tweet.user.is_following ? 'bg-white text-black' : 'text-white'"
                 class="rounded-3xl w-max text-sm border border-white hover:border-red-700 hover:text-red-700 hover:bg-[#7c010c7d] py-1 px-4">
@@ -241,7 +156,62 @@ const hovSec = `<div ref="hoverSection" @mouseover="hoverSection.classList.add('
                 <span class="font-bold text-white">{{ formatNumber(tweet.user.followers) }}</span> Followers
             </div>
         </div>
-    </div>`
+    </div>
+</template>
+
+<script setup>
+import { ref, defineProps, toRefs, onMounted, nextTick } from "vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { formatNumber, betweenTime } from '@/Modules/utilities';
+
+import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
+import DotsHorizontal from "vue-material-design-icons/DotsHorizontal.vue";
+
+import EmoticonSadOutline from "vue-material-design-icons/EmoticonSadOutline.vue";
+import AccountRemove from "vue-material-design-icons/AccountRemove.vue";
+import AccountPlus from "vue-material-design-icons/AccountPlus.vue";
+import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
+import VolumeMute from "vue-material-design-icons/VolumeMute.vue";
+import BlockHelper from "vue-material-design-icons/BlockHelper.vue";
+import CodeLessThan from "vue-material-design-icons/CodeLessThan.vue";
+import AlertOctagonOutline from "vue-material-design-icons/AlertOctagonOutline.vue";
+import ChatRemoveOutline from "vue-material-design-icons/ChatRemoveOutline.vue";
+import HelpCircleOutline from "vue-material-design-icons/HelpCircleOutline.vue";
+
+import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
+import Sync from "vue-material-design-icons/Sync.vue";
+import HeartOutline from "vue-material-design-icons/HeartOutline.vue";
+import ChartBar from "vue-material-design-icons/ChartBar.vue";
+import Share from "vue-material-design-icons/Share.vue";
+import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
+
+import Close from "vue-material-design-icons/Close.vue";
+
+
+const props = defineProps({ tweet: Object, user_auth: Object });
+const { tweet, user_auth } = toRefs(props);
+
+
+const ifTweetMenu = ref(false);
+
+// Control Image
+const openShow = ref(false);
+
+
+// Control Video
+const hoverVideo = ref(false);
+
+
+
+const hoverSection = ref(null);
+async function whenGoHover(e) {
+    hoverSection.value.style.left = `${e.target.getBoundingClientRect().x - 50}px`;
+    hoverSection.value.style.top = `${e.target.getBoundingClientRect().y + 25}px`;
+    hoverSection.value.classList.add('showVisible');
+}
+async function whenLeaveHover() {
+    hoverSection.value.classList.remove('showVisible');
+}
 </script>
 
 

@@ -15,7 +15,8 @@
                 <Item title="Explore" ico="Tag" url="/mag" />
                 <Item title="Explore" ico="Explore" url="/mag" v-if="check_auth" />
                 <Item title="Notifications" ico="Notif" url="/mag" v-if="check_auth" />
-                <Item title="Profile" ico="Account" v-if="check_auth" />
+                <Item title="Profile" ico="Account" :href="route('profiling.index', { name: user_auth.name })"
+                    v-if="check_auth" />
                 <Item title="Settings" ico="Settings" url="/mag" />
 
                 <!-- Tweet Button -->
@@ -29,8 +30,7 @@
             <!-- User Button full -->
             <div v-if="check_auth" @click="ifUserMenu = !ifUserMenu"
                 class="flex items-center justify-center hover:bg-[#d6d9db1f] rounded-full my-2 p-2 w-max transition transition-200 max-[512px]:hidden relative">
-                <img src="https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png"
-                    class="rounded-full inline-block w-[45px] h-[45px]" alt="user image" />
+                <img :src="user_auth.avatar" class="rounded-full inline-block w-[45px] h-[45px]" :alt="user_auth.name" />
                 <div class="text-white mx-2 xl:inline-block max-xl:hidden font-serif font-semibold">
                     <p class="font-bold">{{ user_auth.name }}</p>
                     <span class="text-slate-500 font-light">@{{ user_auth.handle_name }}</span>

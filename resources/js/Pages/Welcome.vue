@@ -8,14 +8,15 @@
             <template #content>
                 <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
                     <!-- Header Content -->
-                    <HeaderMain>
+                    <HeaderMain title="Home" logoHere="true">
                         <LinkHeaderLayout pagecompare="/" title="for you" />
                         <LinkHeaderLayout pagecompare="/following" title="Following" />
                     </HeaderMain>
                     <!-- New Post Tweet -->
                     <NewTweetaGround :check_auth="check_auth" />
                     <!-- All Posts -->
-                    <Tweeta v-for="(post, i) in tweets" :key="i" :tweet="post" :scrolling="currentScroll" />
+                    <Tweeta v-for="(post, i) in tweets" :key="i" :tweet="post" :user_auth="user_auth"
+                        :scrolling="currentScroll" />
                     <!-- Loader Section -->
                     <div v-show="loaderShow" class="w-full h-max p-3 flex justify-center items-center">
                         <LoaderFloating :showing="loaderShow" floating="false" />
