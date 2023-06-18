@@ -148,10 +148,10 @@
                                     </button>
                                 </a>
                                 <!-- More Button -->
-                                <a href="#"
+                                <Link :href="route('users.index')"
                                     class="no-underline hover:bg-[#d6d9db1f] py-3 px-3 flex flex-row justify-start items-center">
-                                    <div class="text-base font-light text-[#1d9bf0]">Show more</div>
-                                </a>
+                                <div class="text-base font-light text-[#1d9bf0]">Show more</div>
+                                </Link>
                             </div>
 
                             <!-- New To Twitter Box -->

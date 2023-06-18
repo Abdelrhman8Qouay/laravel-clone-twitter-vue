@@ -1,20 +1,15 @@
 <template>
     <main>
-        <LayoutTwitter searchinput="false" pagetitle="Home/Twitter" pagename="Home" :user_auth="user_auth"
+        <LayoutTwitter searchinput="true" pagetitle="Connect / Twitter" pagename="Connect" :user_auth="user_auth"
             :check_auth="check_auth">
             <!-- Content Slot Here -->
             <template #content>
                 <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
                     <!-- Header Content -->
-                    <HeaderMain title="Home" logoHere="true">
-                        <LinkHeaderLayout pagecompare="/" title="for you" />
-                        <LinkHeaderLayout pagecompare="/following" title="Following" />
+                    <HeaderMain title="Connect" logoHere="false">
                     </HeaderMain>
-                    <!-- New Post Tweet -->
-                    <NewTweetaGround :check_auth="check_auth" :user_auth="user_auth" />
                     <!-- All Posts -->
-                    <Tweeta v-for="(post, i) in tweets" :key="i" :tweet="post" :user_auth="user_auth"
-                        :check_auth="check_auth" :scrolling="currentScroll" />
+                    <div> {{ all_users }} </div>
                     <!-- Loader Section -->
                     <div v-show="loaderShow" class="w-full h-max p-3 flex justify-center items-center">
                         <LoaderFloating :showing="loaderShow" floating="false" />
@@ -29,14 +24,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, defineProps } from "vue";
-import { getPosts } from '@/Modules/utilities';
+import { ref, onMounted, defineProps } from "vue";
 import { useInfiniteScroll } from '@vueuse/core';
 
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
 import HeaderMain from "@/Components/HeaderMain.vue";
-import NewTweetaGround from "@/Components/NewTweetaGround.vue";
-import Tweeta from "@/Components/Tweeta.vue";
+
 import LoaderFloating from "@/Components/LoaderFloating.vue";
 
 import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
@@ -48,7 +41,7 @@ const currentScroll = ref(null);
 
 
 // Get Posts And Create
-defineProps({ tweets: Array, user_auth: Array, check_auth: Boolean })
+defineProps({ user_auth: Array, all_users: Array, check_auth: Boolean })
 // const posts = ref(getPosts(10));
 // const scrollComponent = ref(null);
 // // Force Render Components

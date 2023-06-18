@@ -17,6 +17,7 @@ import BellOutline from "vue-material-design-icons/BellOutline.vue";
 import CogOutline from "vue-material-design-icons/CogOutline.vue";
 import Magnify from "vue-material-design-icons/Magnify.vue";
 import AccountOutline from "vue-material-design-icons/AccountOutline.vue";
+import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
 
 const props = defineProps({
     title: String,
@@ -34,4 +35,5 @@ if (ico.value === "Notif") IconStr.value = BellOutline;
 if (ico.value === "Settings") IconStr.value = CogOutline;
 if (ico.value === "Explore") IconStr.value = Magnify;
 if (ico.value === "Account") IconStr.value = AccountOutline;
+if (ico.value === "Verified") IconStr.value = CheckDecagram;
 </script>

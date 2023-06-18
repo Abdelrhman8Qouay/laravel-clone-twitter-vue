@@ -1,12 +1,11 @@
 <template>
-    <div class="w-full flex overflow-hidden max-[512px]:hidden border-b border-b-slate-500 p-2" v-if="check_auth">
+    <div class="w-full flex max-[512px]:hidden border-b border-b-slate-500 p-2" v-if="check_auth">
         <!-- Image User Avatar -->
         <div class="w-[51px] max-h-[51px] mr-3 relative group">
-            <a href="#">
-                <img src="https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png"
-                    class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300" width="50"
-                    height="50" alt="user image" />
-            </a>
+            <Link :href="route('profiling.show', { name: user_auth.handle_name })">
+            <img :src="user_auth.avatar" class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300"
+                width="50" height="50" :alt="user_auth.name" />
+            </Link>
         </div>
         <!-- All Content of Post -->
         <div class="w-[calc(100%-55px)] flex-1 h-full">
@@ -16,26 +15,6 @@
                 <span class="flex justify-center items-center w-full text-white">Everyone
                     <ChevronDown fillColor="#2563eb" :size="22" />
                 </span>
-                <ul
-                    class="hidden group-active:flex flex-col absolute left-0 top-[50px] bg-black shadow-sm shadow-white rounded-lg transition duration-200">
-                    <span class="font-bold text-lg p-2 text-white">Choose audience</span>
-                    <li class="py-2 px-2 hover:bg-[#d6d9db1f]">
-                        <div class="flex flex-row justify-between items-center text-white font-bold text-lg">
-                            <div class="bg-cyan-400 rounded-full p-2">
-                                <Earth fillColor="#fff" :size="22" />
-                            </div>
-                            Everyone
-                        </div>
-                    </li>
-                    <li class="py-2 px-2 hover:bg-[#d6d9db1f]">
-                        <div class="flex flex-row justify-between items-center text-white font-bold text-lg">
-                            <div class="bg-cyan-400 rounded-full p-2">
-                                <AccountHeart fillColor="#fff" :size="22" />
-                            </div>
-                            Everyone
-                        </div>
-                    </li>
-                </ul>
             </div>
             <!-- text tweet post -->
             <div class="w-full mb-2">
@@ -91,31 +70,47 @@
                 </div>
             </div>
             <!-- everyone can replay button -->
-            <div v-if="!activeHover" class="w-max hover:bg-[#0199ff1f] text-sm rounded-full py-1 px-2 group relative mb-1">
-                <span class="flex justify-center items-center w-full text-[#1d9bf0]">
-                    <Earth class="mx-1" fillColor="#1d9bf0" :size="18" />
-                    Everyone can replay
+            <div v-if="activeHover" class="w-max hover:bg-[#0199ff1f] text-sm rounded-full py-1 px-2 group relative mb-1"
+                @click.self="ifVisibleTweetMenu = !ifVisibleTweetMenu">
+                <span class="flex justify-center items-center w-full text-[#1d9bf0]"
+                    @click.self="ifVisibleTweetMenu = !ifVisibleTweetMenu">
+                    <Earth class="mx-1" fillColor="#1d9bf0" :size="18" /> Everyone can
+                    replay
                 </span>
-                <ul
-                    class="hidden group-active:flex flex-col absolute left-0 top-[50px] bg-black shadow-sm shadow-white rounded-lg transition duration-200">
-                    <span class="font-bold text-lg p-2 text-white">Choose audience</span>
-                    <li class="py-2 px-2 hover:bg-[#d6d9db1f]">
-                        <div class="flex flex-row justify-between items-center text-white font-bold text-lg">
-                            <div class="bg-cyan-400 rounded-full p-2">
-                                <Earth fillColor="#fff" :size="22" />
-                            </div>
-                            Everyone
+                <div class="absolute left-[-20%] top-full py-2 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
+                    style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifVisibleTweetMenu">
+                    <div class="text-gray-200 text-base font-semibold mx-2">Who can reply?</div>
+                    <div class="text-gray-500 text-sm mb-1 mx-2">Choose who can reply to this Tweet. <br> Anyone
+                        mentioned can
+                        always reply.</div>
+                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 0;" tabindex="0"
+                        class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
+                        <div class="bg-cyan-400 rounded-full p-2 inline-block">
+                            <Earth fillColor="#fff" :size="22" />
                         </div>
-                    </li>
-                    <li class="py-2 px-2 hover:bg-[#d6d9db1f]">
-                        <div class="flex flex-row justify-between items-center text-white font-bold text-lg">
-                            <div class="bg-cyan-400 rounded-full p-2">
-                                <AccountHeart fillColor="#fff" :size="22" />
-                            </div>
-                            Everyone
+                        Everyone
+                        <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 0" />
+                    </div>
+                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 1;" tabindex="1"
+                        class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
+                        <div class="bg-cyan-400 rounded-full p-2 inline-block">
+                            <AccountHeart fillColor="#fff" :size="22" />
                         </div>
-                    </li>
-                </ul>
+                        People you follow
+                        <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 1" />
+                    </div>
+                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 2;" tabindex="2"
+                        class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
+                        <div class="bg-cyan-400 rounded-full p-2 inline-block">
+                            <At fillColor="#fff" :size="22" />
+                        </div>
+                        Only People you mention
+                        <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 2" />
+                    </div>
+                </div>
             </div>
             <!-- Line Break -->
             <div v-if="activeHover" class="w-full h-[1px] bg-slate-500 mb-1"></div>
@@ -162,7 +157,7 @@
                     <div class="w-[1px] h-4 mx-3 bg-slate-500"></div>
 
                     <!-- tweeting for tweet Button -->
-                    <button :disabled="!tweeting && !showUploaded ? true : false || writeLimit >= 280"
+                    <button @click="storeTweet()" :disabled="!tweeting && !showUploaded ? true : false || writeLimit >= 280"
                         class="flex justify-center items-center bg-[#1d9bf0] hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 rounded-2xl transition transition-200 text-white font-semibold w-max py-1 px-3">
                         <span>Tweet</span>
                     </button>
@@ -173,10 +168,10 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, toRefs } from "vue";
+import { Link, router } from "@inertiajs/vue3";
 
 import Close from "vue-material-design-icons/Close.vue";
-import ArrowLeft from "vue-material-design-icons/ArrowLeft.vue";
 import ChevronDown from "vue-material-design-icons/ChevronDown.vue";
 import Earth from "vue-material-design-icons/Earth.vue";
 import AccountHeart from "vue-material-design-icons/AccountHeart.vue";
@@ -190,12 +185,17 @@ import MapMarkerOutline from "vue-material-design-icons/MapMarkerOutline.vue";
 import AccountTag from "vue-material-design-icons/AccountTag.vue";
 import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
 
-defineProps({ check_auth: Boolean })
+const props = defineProps({ check_auth: Boolean, user_auth: Array })
+const { check_auth, user_auth } = toRefs(props);
 
 // Tweet Overlay
 const activeHover = ref(false);
 
 const tweeting = ref("");
+
+const file = ref('');
+const ifVisibleTweetMenu = ref(false);
+const visibleTweet = ref(0);
 
 const showUploaded = ref("");
 const typeFile = ref({ type: "", ext: "" });
@@ -203,8 +203,9 @@ const textarea = ref(null);
 
 // get File Funcion
 function getFile(e) {
-    let file = e.target.files[0];
-    let type = file.type.split("/");
+    file.value = e.target.files[0];
+    let fileG = e.target.files[0];
+    let type = fileG.type.split("/");
 
     const usedExtsFile = [
         "jpg",
@@ -227,8 +228,8 @@ function getFile(e) {
     ];
 
     //   if this file less than 10 mb & ext in array specified
-    if (file.size <= 10000000 && usedExtsFile.includes(type[1])) {
-        showUploaded.value = URL.createObjectURL(file);
+    if (fileG.size <= 10000000 && usedExtsFile.includes(type[1])) {
+        showUploaded.value = URL.createObjectURL(fileG);
         typeFile.value = { type: type[0], ext: type[1] };
     }
 }
@@ -268,6 +269,35 @@ function authLimitWriting() {
         // normal color
         stopLimitColor.value = '#1d9bf0';
     }
+}
+
+function reTweeting() {
+    visibleTweet.value = 0;
+    tweeting.value = '';
+    writeLimit.value = 0;
+    showUploaded.value = "";
+    file.value = '';
+    activeHover.value = false;
+    ifVisibleTweetMenu.value = false;
+    typeFile.value = { type: "", ext: "" };
+}
+
+// StoreTweet Function
+const storeTweet = () => {
+    if (!tweeting.value && !showUploaded.value) return;
+    if (!user_auth.value) return;
+
+    let data = new FormData();
+
+    data.append('tweet', tweeting.value);
+    data.append('file', file.value);
+    data.append('visible', visibleTweet.value);
+    data.append('user_id', user_auth.value.id);
+
+    // send data with inertia.js on laravel
+    router.post('/tweets', data);
+
+    reTweeting();
 }
 </script>
 

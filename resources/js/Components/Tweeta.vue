@@ -3,7 +3,7 @@
         <!-- Image User Avatar -->
         <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
             ref="userImageTweeta">
-            <Link :href="route('profiling.index', { name: tweet.user.name })">
+            <Link :href="route('profiling.show', { name: tweet.user.handle_name })">
             <img :src="tweet.user.avatar"
                 class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[45px] min-h-[45px]"
                 :alt="tweet.name" />
@@ -14,7 +14,7 @@
             <!-- Title Top -->
             <div class="flex flex-row justify-between items-center w-full">
                 <div class="flex justify-start items-center text-base truncate">
-                    <Link :href="route('profiling.index', { name: tweet.user.name })"
+                    <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
                         class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
                         @mouseleave="whenLeaveHover" ref="userNameTweeta">
                     {{ tweet.user.name }}
@@ -22,14 +22,14 @@
                     <div class="Mark inline-block pl-2" v-if="tweet.user.blue_mark">
                         <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
                     </div>
-                    <Link :href="route('profiling.index', { name: tweet.user.name })"
+                    <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
                         class="text-gray-400 font-light inline-block truncate pl-2" @mouseover="whenGoHover"
                         @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{ tweet.user.handle_name }}
                     </Link>
                     <span class="px-2 text-gray-400">.</span>
                     <span class="text-gray-400 font-light hover:underline">{{ betweenTime(tweet.created_at) }}</span>
                 </div>
-                <div @click="ifTweetMenu = !ifTweetMenu"
+                <div @click="ifTweetMenu = !ifTweetMenu" v-if="check_auth"
                     class="block w-max p-1 float-right hover:bg-[#0199ff1f] rounded-full group relative">
                     <DotsHorizontal class="fill-white stroke-[#71767b] group-hover:stroke-[#2563eb]" fillColor="none"
                         :size="22" />
@@ -160,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, toRefs, onMounted, nextTick } from "vue";
+import { ref, defineProps, toRefs } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
@@ -188,8 +188,8 @@ import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
 import Close from "vue-material-design-icons/Close.vue";
 
 
-const props = defineProps({ tweet: Object, user_auth: Object });
-const { tweet, user_auth } = toRefs(props);
+const props = defineProps({ tweet: Object, user_auth: Object, check_auth: Boolean });
+const { tweet, user_auth, check_auth } = toRefs(props);
 
 
 const ifTweetMenu = ref(false);

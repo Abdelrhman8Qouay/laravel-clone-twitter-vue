@@ -11,11 +11,10 @@
                 </Link>
 
                 <!-- Url Lists -->
-                <Item title="Home" ico="Home" url="/mag" v-if="check_auth" />
+                <Item title="Home" ico="Home" href="/" v-if="check_auth" />
                 <Item title="Explore" ico="Tag" url="/mag" />
-                <Item title="Explore" ico="Explore" url="/mag" v-if="check_auth" />
-                <Item title="Notifications" ico="Notif" url="/mag" v-if="check_auth" />
-                <Item title="Profile" ico="Account" :href="route('profiling.index', { name: user_auth.name })"
+                <Item title="Verified" ico="Verified" url="/mag" v-if="check_auth" />
+                <Item title="Profile" ico="Account" :href="route('profiling.show', { name: user_auth.handle_name })"
                     v-if="check_auth" />
                 <Item title="Settings" ico="Settings" url="/mag" />
 
@@ -82,8 +81,9 @@
             <!-- Tweet Container Flex -->
             <div class="flex flex-row gap-3 w-full">
                 <!-- User Image -->
-                <img src="https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png"
-                    class="rounded-full w-[45px] h-[45px]" alt="user image" />
+                <Link :href="route('profiling.show', { name: user_auth.handle_name })">
+                <img :src="user_auth.avatar" class="rounded-full w-[45px] h-[45px]" :alt="user_auth.name" />
+                </Link>
                 <!-- tweet content -->
                 <div class="w-full">
                     <!-- can see menu button -->
@@ -324,7 +324,6 @@ function SaveCloseTweeta() {
 // close image file Function
 function closeImage() {
     file.value = "";
-    visibleTweet.value = 0;
     showUploaded.value = "";
     typeFile.value = { type: "", ext: "" };
 }

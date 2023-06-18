@@ -14,8 +14,6 @@ class TweetController extends Controller
      */
     public function index()
     {
-        // dd(Tweet::where('user_id', '=',2)->first()->tweet);
-        // $users_id = Tweet::
         return Inertia::render('Welcome', [
             'tweets' => Tweet::orderBy('id', 'desc')->with('user')->get(),
             // 'users_tweeted' => User::where('name', '=',$name)->get(),

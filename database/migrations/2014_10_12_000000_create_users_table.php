@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('handle_name')->unique();
             $table->boolean('blue_mark')->nullable();
             $table->text('bio')->nullable();
             $table->string('location')->nullable();
             $table->string('website_url')->nullable();
-            $table->string('head_image')->nullable();
+            $table->string('head_image')->default('/uploads/users/heads/empty_head.jpg');
             $table->string('avatar')->default('/uploads/users/avatars/empty_user.png');
             $table->integer('following')->default(0);
             $table->integer('followers')->default(0);

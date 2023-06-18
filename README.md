@@ -45,6 +45,8 @@ npm i pinia pinia-plugin-presistedstate ( install pinia with inertia js )
 
 npm i @vueuse/core ( install the vueuse to make the infinite scrolling loading )
 
+npm install --save cropperjs ( install cropperjs Lib ) to make the crop for user images
+
 
 ## Commands Used To Database
 

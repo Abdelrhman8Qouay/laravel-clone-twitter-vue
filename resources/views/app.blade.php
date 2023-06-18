@@ -24,6 +24,9 @@
             body {
             background: #000;
             }
+            body.noscroll {
+                overflow: hidden;
+            }
         </style>
     </head>
     <body class="font-sans antialiased">
