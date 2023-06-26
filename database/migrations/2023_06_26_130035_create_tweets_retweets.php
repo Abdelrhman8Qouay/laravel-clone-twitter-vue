@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tweets', function (Blueprint $table) {
+        Schema::create('tweets_retweets', function (Blueprint $table) {
             $table->id();
-            $table->text('tweet')->nullable();
-            $table->string('file')->nullable();
-            $table->boolean('is_video')->nullable();
-            $table->enum('visible', [0, 1, 2])->default(0);
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->unsigned();
+            $table->unsignedBigInteger('tweet_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('tweet_id')->references('id')->on('tweets');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tweets');
+        Schema::dropIfExists('tweets_retweets');
     }
 };

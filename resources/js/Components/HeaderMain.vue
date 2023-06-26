@@ -4,6 +4,9 @@
             <span class="text-white font-semibold text-base block max-[512px]:hidden">{{ title }}</span>
             <TwitterLogo v-if="logoHere" class="hidden max-[512px]:block" fillColor="#1d9bf0" :size="32" />
         </div>
+        <div class="w-full">
+            <slot name="more"></slot>
+        </div>
         <div class="flex border-b border-b-slate-500">
             <slot>Call Links Here</slot>
         </div>

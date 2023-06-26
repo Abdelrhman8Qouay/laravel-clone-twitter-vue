@@ -5,13 +5,13 @@
             class="flex flex-col items-end justify-between w-max h-full max-[512px]:w-full ml-auto max-[512px]:ml-0 max-[512px]:flex-row max-[512px]:items-center max-[512px]:justify-between">
             <div class="w-full max-[512px]:flex max-[512px]:flex-row max-[512px]:items-center max-[512px]:justify-between">
                 <!-- twitter logo home -->
-                <Link as="button" href="/"
+                <Link as="button" :href="route('tweets.index')" preserve-state
                     class="block hover:bg-[#d6d9db1f] rounded-full p-2 w-max transition transition-200 max-[512px]:hidden">
                 <TwitterLogo fillColor="#fff" :size="35" />
                 </Link>
 
                 <!-- Url Lists -->
-                <Item title="Home" ico="Home" href="/" v-if="check_auth" />
+                <Item title="Home" ico="Home" :href="route('tweets.index')" preserve-state v-if="check_auth" />
                 <Item title="Explore" ico="Tag" url="/mag" />
                 <Item title="Verified" ico="Verified" url="/mag" v-if="check_auth" />
                 <Item title="Profile" ico="Account" :href="route('profiling.show', { name: user_auth.handle_name })"
@@ -40,7 +40,7 @@
                     <div class="bg-gray-600 w-full h-[1px]"></div>
                     <Link as="button" class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] text-start">add an
                     existing account</Link>
-                    <Link as="button" :href="route('logout')" @click.prevent="location.reload()" method="post"
+                    <Link as="button" :href="route('logout')" @click.prevent method="post"
                         class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] text-start">log out @{{
                             user_auth.handle_name }}</Link>
                 </div>

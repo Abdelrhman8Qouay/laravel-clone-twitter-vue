@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Susers', [
+        return Inertia::render('Profiling/Index', [
             'check_auth' => auth()->check(),
             'user_auth' => auth()->user(),
             'all_users' => User::all(),
@@ -33,12 +33,53 @@ class UserController extends Controller
     {
         $userUsed = User::where('handle_name', '=',$name)->first();
 
-        return Inertia::render('Profiling', [
-            'user_own' => User::where('handle_name', '=',$name)->first(),
-            'tweets_own' => Tweet::orderBy('id', 'desc')->with('user')->get()->where('user_id', '=',$userUsed->id),
+        return Inertia::render('Profiling/Show', [
+            'user_own' => $userUsed,
+            'user_followers' => $userUsed->followers()->count(),
+            'user_following' => $userUsed->following()->count(),
+            'tweets_own' => Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers')->get()->where('user_id', '=',$userUsed->id),
             'check_auth' => auth()->check(),
             'user_auth' => auth()->user(),
         ]);
+    }
+
+    /**
+     * Display all followers or all following from users.
+     */
+    public function showFollowingFollowers($name, $what)
+    {
+        $userUsed = User::where('handle_name', '=',$name)->first();
+        $arrPage = [];
+
+        if($what === 'followers') {
+            $arrPage = [
+                'user_own' => $userUsed,
+                'user_follows' => $userUsed->followers()->paginate(8),
+                'check_auth' => auth()->check(),
+                'user_auth' => auth()->user(),
+            ];
+        } elseif ($what === 'following') {
+            $arrPage = [
+                'user_own' => $userUsed,
+                'user_follows' => $userUsed->following()->paginate(8),
+                'check_auth' => auth()->check(),
+                'user_auth' => auth()->user(),
+            ];
+        } else {
+            return;
+        }
+
+        return Inertia::render('Profiling/AllFollows', $arrPage);
+    }
+
+    /**
+     * Attach & Detach (toggle) follow user.
+     */
+    public function toggleFollow(User $user_id)
+    {
+        User::where('id', '=', auth()->user()->id)->first()->following()->toggle($user_id->id);
+
+        return redirect()->back();
     }
 
     /**

@@ -30,11 +30,15 @@ Route::delete('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'de
 // -------------- Auth Middleware Group ------------
 Route::middleware('auth')->group(function () {
     // -------------- User Profile Index ------------
-    Route::get('/susers', [UserController::class, 'index'])->name('users.index');
+    Route::get('/all', [UserController::class, 'index'])->name('users.index');
+    // -------------- User Profile All Follows ------------
+    Route::get('/profilee/{name}/{what}', [UserController::class, 'showFollowingFollowers'])->name('users.allfollows');
     // -------------- User Profile Show ------------
-    Route::get('/profiling/{name}', [UserController::class, 'show'])->name('profiling.show');
+    Route::get('/profilee/{name}', [UserController::class, 'show'])->name('profiling.show');
     // -------------- User Profile Update ------------
     Route::put('/profiling', [UserController::class, 'update'])->name('profiling.update');
+    // -------------- following & followers ( attach , detach ) toggling methods -------------
+    Route::post('/profilee/{user_id}/follow', [UserController::class, 'toggleFollow'])->name('users.togglefollow');
 
     // -------------- Profile Default Pages ------------
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

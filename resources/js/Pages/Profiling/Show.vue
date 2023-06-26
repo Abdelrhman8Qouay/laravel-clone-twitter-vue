@@ -80,12 +80,12 @@
                             </div>
                             <!-- Follow Part -->
                             <div class="w-full mb-4">
-                                <a href="#"
-                                    class="inline-block text-base no-underline hover:underline text-gray-400 font-normal mx-2"><span
-                                        class="font-bold mx-1 text-white">{{ user_own.following }}</span>following</a>
-                                <a href="#"
-                                    class="inline-block text-base no-underline hover:underline text-gray-400 font-normal mx-2"><span
-                                        class="font-bold mx-1 text-white">{{ user_own.followers }}</span>followers</a>
+                                <Link :href="route('users.allfollows', { name: user_own.handle_name, what: 'following' })"
+                                    class="inline-block text-base no-underline hover:underline text-gray-400 font-normal mx-2">
+                                <span class="font-bold mx-1 text-white">{{ user_following }}</span>following</Link>
+                                <Link :href="route('users.allfollows', { name: user_own.handle_name, what: 'followers' })"
+                                    class="inline-block text-base no-underline hover:underline text-gray-400 font-normal mx-2">
+                                <span class="font-bold mx-1 text-white">{{ user_followers }}</span>followers</Link>
                             </div>
                         </div>
                     </div>
@@ -253,8 +253,10 @@ const props = defineProps({
     check_auth: Boolean,
     user_own: Array,
     tweets_own: Array,
+    user_followers: Number,
+    user_following: Number,
 });
-const { user_auth, check_auth, user_own, tweets_own } = toRefs(props);
+const { user_auth, check_auth, user_own, tweets_own, user_followers, user_following } = toRefs(props);
 // const posts = ref(getPosts(10));
 // const scrollComponent = ref(null);
 // // Force Render Components

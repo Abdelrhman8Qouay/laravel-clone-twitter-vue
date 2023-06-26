@@ -63,7 +63,7 @@
             </div>
 
             <!-- Points Of Post Div -->
-            <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
+            <!-- <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
                 <div class="cursor-pointer flex-1 flex justify-between items-center group">
                     <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
                         <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
@@ -80,7 +80,7 @@
                 </div>
                 <div class="cursor-pointer flex-1 flex justify-between items-center group">
                     <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff017362]">
-                        <HeartOutline class="stroke-gray-500 group-hover:stroke-rose-600" :size="16" />
+                        <Heart class="stroke-gray-500 group-hover:stroke-rose-600" :size="16" />
                     </div>
                     <span class="text-gray-400 flex-1 text-sm group-hover:text-rose-600">{{ formatNumber(tweet.likes)
                     }}</span>
@@ -96,9 +96,8 @@
                     <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
                         <Share class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
                     </div>
-
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -117,43 +116,51 @@
     <!-- Hover User Section  -->
     <div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
         @mouseleave="hoverSection.classList.remove('showVisible')"
-        class="w-[360px] bg-black cursor-default shadow shadow-white p-3 fixed invisible delay-700 transition duration-300 z-[12000] rounded-2xl">
+        class="w-[310px] bg-black cursor-default shadow shadow-white p-3 fixed invisible delay-700 transition duration-300 z-[12000] rounded-2xl">
         <!-- Image & Button -->
         <div class="flex justify-between items-start">
-            <a href="#">
-                <img :src="tweet.image" class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300"
-                    width="60" height="60" :alt="tweet.user.name" />
-            </a>
-            <button :class="!tweet.user.is_following ? 'bg-white text-black' : 'text-white'"
-                class="rounded-3xl w-max text-sm border border-white hover:border-red-700 hover:text-red-700 hover:bg-[#7c010c7d] py-1 px-4">
-                {{ tweet.user.is_following ? 'following' : 'follow' }}
-            </button>
-        </div>
-        <!-- User Name -->
-        <div class="text-white font-bold text-lg inline-block mb-1 leading-4">
-            {{ tweet.user.name }}
-            <div class="Mark inline-block">
-                <CheckDecagram class="inline-block" fillColor="#2563eb" :size="16" />
+            <Link :href="route('profiling.show', { name: tweet.user.handle_name })">
+            <img :src="tweet.user.avatar" class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300"
+                width="60" height="60" :alt="tweet.user.name" />
+            </Link>
+            <div v-if="check_auth">
+                <Link as="button" method="post" :href="route('users.togglefollow', { user_id: tweet.user.id })"
+                    @click="is_following = !is_following" preserve-scroll v-if="tweet.user.id !== user_auth.id"
+                    :class="is_following ? 'bg-white text-black' : 'text-white'"
+                    class="rounded-3xl w-max text-sm border border-white hover:border-red-700 hover:text-red-700 hover:bg-[#7c010c7d] font-semibold py-2 px-6">
+                {{ is_following ? 'following' : 'follow' }}
+                </Link>
             </div>
         </div>
-        <!-- User TagName -->
-        <span class="text-gray-400 font-light text-sm truncate flex items-center mb-2">@{{ tweet.user.handle }}</span>
-        <!-- Description Text -->
-        <div class="text-white font-bold text-lg block mb-2">
-            <!-- Title -->
-            <div class="text-white text-base font-semibold">
-                {{ tweet.user.description }}
+        <div class="m-2">
+            <!-- User Name -->
+            <div class="text-white font-bold text-lg inline-block mb-1 leading-4">
+                {{ tweet.user.name }}
+                <div class="Mark inline-block" v-if="tweet.user.blue_mark">
+                    <CheckDecagram class="inline-block" fillColor="#2563eb" :size="16" />
+                </div>
             </div>
-            <!-- Own Website -->
-            <a href="#" class="no-underline hover:underline text-sm">qouayntQue.com</a>
-        </div>
-        <!-- Follow Flex -->
-        <div class="flex flex-row justify-start items-center gap-3 text-sm mb-2">
-            <div class="text-gray-400 font-light">
-                <span class="font-bold text-white">{{ formatNumber(tweet.user.following) }}</span> Following
+            <!-- User TagName -->
+            <span class="text-gray-400 font-light text-sm truncate flex items-center mb-2">@{{ tweet.user.handle_name
+            }}</span>
+            <!-- Description Text -->
+            <div class="text-white font-bold text-lg block mb-2">
+                <!-- Title -->
+                <div class="text-white text-base font-semibold">
+                    {{ tweet.user.bio }}
+                </div>
+                <!-- Own Website -->
+                <a :href="tweet.user.website_url" class="no-underline hover:underline text-sm">{{ tweet.user.website_url
+                }}</a>
             </div>
-            <div class="text-gray-400 font-light">
-                <span class="font-bold text-white">{{ formatNumber(tweet.user.followers) }}</span> Followers
+            <!-- Follow Flex -->
+            <div class="flex flex-row justify-start items-center gap-3 text-sm mb-2">
+                <div class="text-gray-400 font-light">
+                    <span class="font-bold text-white">{{ formatNumber(tweet.user.following.length) }}</span> Following
+                </div>
+                <div class="text-gray-400 font-light">
+                    <span class="font-bold text-white">{{ formatNumber(tweet.user.followers.length) }}</span> Followers
+                </div>
             </div>
         </div>
     </div>
@@ -180,7 +187,7 @@ import HelpCircleOutline from "vue-material-design-icons/HelpCircleOutline.vue";
 
 import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
 import Sync from "vue-material-design-icons/Sync.vue";
-import HeartOutline from "vue-material-design-icons/HeartOutline.vue";
+import Heart from "vue-material-design-icons/Heart.vue";
 import ChartBar from "vue-material-design-icons/ChartBar.vue";
 import Share from "vue-material-design-icons/Share.vue";
 import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
@@ -191,8 +198,14 @@ import Close from "vue-material-design-icons/Close.vue";
 const props = defineProps({ tweet: Object, user_auth: Object, check_auth: Boolean });
 const { tweet, user_auth, check_auth } = toRefs(props);
 
-
 const ifTweetMenu = ref(false);
+
+// Points Of User Tweeta
+const is_following = ref(tweet.value.user.followers.some(follower => follower.id === user_auth.value.id));
+// const has_liked = ref(tweet.value.user.followers.some(follower => follower.id === user_auth.value.id));
+// const has_retweeted = ref(tweet.value.user.followers.some(follower => follower.id === user_auth.value.id));
+// Live Numbers
+const likesNum = ref();
 
 // Control Image
 const openShow = ref(false);

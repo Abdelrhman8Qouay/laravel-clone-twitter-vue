@@ -12,11 +12,18 @@ class TweetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $tweets = Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers', 'likes', 'retweets')->paginate(3);
+
+        dd($tweets);
+        if($request->wantsJson()) {
+            return $tweets;
+        }
+
         return Inertia::render('Welcome', [
-            'tweets' => Tweet::orderBy('id', 'desc')->with('user')->get(),
-            // 'users_tweeted' => User::where('name', '=',$name)->get(),
+            // 'tweets' => Tweet::orderBy('id', 'desc')->with('user')->get(),
+            'tweets' => $tweets,
             'check_auth' => auth()->check(),
             'user_auth' => auth()->user(),
         ]);
@@ -65,6 +72,7 @@ class TweetController extends Controller
         $tweet->analytics = 0;
 
         $tweet->save();
+        return redirect()->back();
     }
 
     /**
@@ -73,6 +81,26 @@ class TweetController extends Controller
     public function show(Tweet $tweet)
     {
         //
+    }
+
+    /**
+     * Attach & Detach (toggle) user likes.
+     */
+    public function toggleLikes(Tweet $tweet)
+    {
+        $tweet->likes()->toggle(auth()->user()->id);
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user retweets.
+     */
+    public function toggleRetweets(Tweet $tweet)
+    {
+        $tweet->retweets()->toggle(auth()->user()->id);
+
+        return redirect()->back();
     }
 
     /**
@@ -104,6 +132,6 @@ class TweetController extends Controller
 
         $tweet->delete();
 
-        return redirect()->route('tweets.index');
+        return redirect()->back();
     }
 }
