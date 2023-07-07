@@ -2,7 +2,7 @@
     <div
         class="select-none border-r border-r-slate-500 bg-black lg:w-3/12 w-[60px] transition-all duration-300 h-screen p-2 max-sm:p-1 max-[512px]:h-max max-[512px]:w-screen max-[512px]:absolute max-[512px]:left-0 max-[512px]:bottom-0 max-[512px]:border-l-0 max-[512px]:border-t max-[512px]:border-t-slate-400 max-[512px]:z-[2000]">
         <div
-            class="flex flex-col items-end justify-between w-max h-full max-[512px]:w-full ml-auto max-[512px]:ml-0 max-[512px]:flex-row max-[512px]:items-center max-[512px]:justify-between">
+            class="flex flex-col items-end justify-between w-[240px] h-full max-[512px]:w-full ml-auto max-[512px]:ml-0 max-[512px]:flex-row max-[512px]:items-center max-[512px]:justify-between">
             <div class="w-full max-[512px]:flex max-[512px]:flex-row max-[512px]:items-center max-[512px]:justify-between">
                 <!-- twitter logo home -->
                 <Link as="button" :href="route('tweets.index')" preserve-state
@@ -11,15 +11,16 @@
                 </Link>
 
                 <!-- Url Lists -->
-                <Item title="Home" ico="Home" :href="route('tweets.index')" preserve-state v-if="check_auth" />
+                <Item title="Home" ico="Home" :href="route('tweets.index')" preserve-state v-if="user_auth" />
                 <Item title="Explore" ico="Tag" url="/mag" />
-                <Item title="Verified" ico="Verified" url="/mag" v-if="check_auth" />
+                <Item title="Verified" ico="Verified" url="/mag" v-if="user_auth" />
+                <Item title="Bookmarks" ico="bookmark" url="/mag" v-if="user_auth" />
                 <Item title="Profile" ico="Account" :href="route('profiling.show', { name: user_auth.handle_name })"
-                    v-if="check_auth" />
+                    v-if="user_auth" />
                 <Item title="Settings" ico="Settings" url="/mag" />
 
                 <!-- Tweet Button -->
-                <button @click="openTweet = true" type="button" v-if="check_auth"
+                <button @click="openTweet = true" type="button" v-if="user_auth"
                     class="flex justify-center items-center bg-[#1d9bf0] hover:bg-[#1a8cd8] rounded-full p-2 my-4 transition transition-200 text-white font-semibold w-full xl:w-full sm:w-max max-sm:w-max sm:p-3 max-sm:p-3 max-[512px]:absolute max-[512px]:right-0 max-[512px]:top-[-80px]">
                     <span class="xl:inline-block max-xl:hidden">Tweet</span>
                     <PencilPlusOutline class="xl:hidden max-xl:block" fillColor="#fff" :size="25" />
@@ -27,12 +28,15 @@
             </div>
 
             <!-- User Button full -->
-            <div v-if="check_auth" @click="ifUserMenu = !ifUserMenu"
-                class="flex items-center justify-center hover:bg-[#d6d9db1f] rounded-full my-2 p-2 w-max transition transition-200 max-[512px]:hidden relative">
-                <img :src="user_auth.avatar" class="rounded-full inline-block w-[45px] h-[45px]" :alt="user_auth.name" />
-                <div class="text-white mx-2 xl:inline-block max-xl:hidden font-serif font-semibold">
-                    <p class="font-bold">{{ user_auth.name }}</p>
-                    <span class="text-slate-500 font-light">@{{ user_auth.handle_name }}</span>
+            <div v-if="user_auth" @click="ifUserMenu = !ifUserMenu"
+                class="flex items-center justify-between hover:bg-[#d6d9db1f] rounded-full my-2 p-2 w-full transition transition-200 max-[512px]:hidden relative">
+                <div class="flex-1 flex justify-start items-center">
+                    <img :src="user_auth.avatar" class="rounded-full inline-block w-[45px] h-[45px]"
+                        :alt="user_auth.name" />
+                    <div class="text-white mx-2 xl:inline-block max-xl:hidden font-serif font-semibold truncate">
+                        <p class="font-bold truncate">{{ user_auth.name }}</p>
+                        <span class="text-slate-500 font-light truncate">@{{ user_auth.handle_name }}</span>
+                    </div>
                 </div>
                 <DotsHorizontal class="xl:inline-block max-xl:hidden" fillColor="#fff" :size="25" />
                 <div class="absolute left-[-20%] bottom-full py-2 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
@@ -292,8 +296,8 @@ import MapMarkerOutline from "vue-material-design-icons/MapMarkerOutline.vue";
 import AccountTag from "vue-material-design-icons/AccountTag.vue";
 import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
 
-const props = defineProps({ user_auth: Array, check_auth: Boolean })
-const { user_auth, check_auth } = toRefs(props);
+const props = defineProps({ user_auth: Array })
+const { user_auth } = toRefs(props);
 
 const ifUserMenu = ref(false);
 

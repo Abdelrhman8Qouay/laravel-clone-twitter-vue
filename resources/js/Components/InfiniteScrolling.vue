@@ -1,5 +1,5 @@
 <template>
-    <div ref="list_scrolling">
+    <div ref="list_scrolling" @scroll="$emit('whenScroll', list_scrolling)">
         <slot></slot>
         <!-- Loader Section -->
         <div v-show="loading" class="w-full h-max p-3 flex justify-center items-center">

@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex max-[512px]:hidden border-b border-b-slate-500 p-2" v-if="check_auth">
+    <div class="w-full flex max-[512px]:hidden border-b border-b-slate-500 p-2">
         <!-- Image User Avatar -->
         <div class="w-[51px] max-h-[51px] mr-3 relative group">
             <Link :href="route('profiling.show', { name: user_auth.handle_name })">
@@ -19,43 +19,32 @@
             <!-- text tweet post -->
             <div class="w-full mb-2">
                 <textarea @click="activeHover = true" @input="(e) => { heightingTweetaText(e); authLimitWriting(e) }"
-                    ref="textarea" :class="showUploaded ? 'h-max' : ''"
+                    ref="textarea" :class="showImageUploaded || showVideoUploaded ? 'h-max' : ''"
                     class="text-white bg-transparent font-normal min-h-[120px] w-full border-0 outline-none focus:ring-0 placeholder:text-gray-500 placeholder:text-lg placeholder:font-light"
-                    v-model="tweeting" name="tweeta" placeholder="What is happening?!"></textarea>
+                    v-model="data.tweet" name="tweeta" placeholder="What is happening?!"></textarea>
                 <!-- images & videos -->
-                <div v-if="typeFile.type === 'image' && showUploaded" class="relative min-w-full max-w-full rounded-2xl">
-                    <button @click="closeImage"
-                        class="rounded-full cursor-pointer p-1 bg-[#0f1419bf] backdrop-blur-sm hover:bg-[#0f141973] absolute left-2 top-2 flex justify-center items-center transition duration-500">
-                        <Close fillColor="#fff" :size="22" />
-                    </button>
-                    <img class="max-w-full max-h-full object-cover rounded-2xl" :src="showUploaded" alt="" />
-                    <span @click="closeImage"
-                        class="rounded-lg w-max p-1 bg-[#0f1419bf] backdrop-blur-sm absolute left-2 bottom-8 text-white uppercase text-xs">
-                        {{ typeFile.ext }}
-                    </span>
-                    <div class="flex flex-row items-center gap-3 mt-1">
-                        <a href="#"
-                            class="flex justify-center items-center text-xs text-gray-500 font-extralight no-underline hover:underline">
-                            <AccountTag class="inline-block mx-1" fillColor="#6b7280" :size="18" />
-                            Tag People
-                        </a>
-                        <a href="#"
-                            class="flex justify-center items-center text-xs text-gray-500 font-extralight no-underline hover:underline">
-                            <ListBoxOutline class="inline-block mx-1" fillColor="#6b7280" :size="18" />
-                            Add Description
-                        </a>
+                <div v-if="showImageUploaded.length" class="h-[320px] w-full overflow-hidden">
+                    <div class="relative h-full w-full flex flex-row flex-wrap gap-4">
+                        <div v-for="(imgObj, i) in showImageUploaded" :key="i" class="relative h-full flex-1">
+                            <button @click="closeIV('image', imgObj.ima)"
+                                class="rounded-full cursor-pointer p-1 bg-[#0f1419bf] backdrop-blur-sm hover:bg-[#0f141973] absolute left-2 top-2 flex justify-center items-center transition duration-500">
+                                <Close fillColor="#fff" :size="22" />
+                            </button>
+                            <img class="w-full h-full object-cover rounded-2xl" :src="imgObj.ima"
+                                :alt="'image: ' + i + 1" />
+                        </div>
                     </div>
                 </div>
-                <div v-if="typeFile.type === 'video' && showUploaded" class="relative min-w-full max-w-full rounded-2xl">
-                    <button @click="closeImage"
+                <div v-else-if="showVideoUploaded" class="relative min-w-full max-w-full rounded-2xl">
+                    <button @click="closeIV('video')"
                         class="rounded-full cursor-pointer p-1 bg-[#0f1419bf] backdrop-blur-sm hover:bg-[#0f141973] absolute left-2 top-2 flex justify-center items-center transition duration-500 z-10">
                         <Close fillColor="#fff" :size="22" />
                     </button>
                     <video class="max-w-full max-h-full object-cover rounded-2xl" controls>
-                        <source :src="showUploaded" :type="typeFile.type + '/' + typeFile.ext" />
+                        <source :src="showVideoUploaded.vid" :type="typeFile.type + '/' + typeFile.ext" />
                         Your browser does not support the video element.
                     </video>
-                    <div class="flex flex-row items-center gap-3 mt-1">
+                    <!-- <div class="flex flex-row items-center gap-3 mt-1">
                         <a href="#"
                             class="flex justify-center items-center text-xs text-gray-500 font-extralight no-underline hover:underline">
                             <AccountTag class="inline-block mx-1" fillColor="#6b7280" :size="18" />
@@ -66,7 +55,7 @@
                             <ListBoxOutline class="inline-block mx-1" fillColor="#6b7280" :size="18" />
                             Add Description
                         </a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <!-- everyone can replay button -->
@@ -83,32 +72,32 @@
                     <div class="text-gray-500 text-sm mb-1 mx-2">Choose who can reply to this Tweet. <br> Anyone
                         mentioned can
                         always reply.</div>
-                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 0;" tabindex="0"
+                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 'a';" tabindex="0"
                         class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
                         <div class="bg-cyan-400 rounded-full p-2 inline-block">
                             <Earth fillColor="#fff" :size="22" />
                         </div>
                         Everyone
                         <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
-                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 0" />
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="data.visible === 'a'" />
                     </div>
-                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 1;" tabindex="1"
+                    <div @click.prevent="ifVisibleTweetMenu = false; data.visible = 'f';" tabindex="1"
                         class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
                         <div class="bg-cyan-400 rounded-full p-2 inline-block">
                             <AccountHeart fillColor="#fff" :size="22" />
                         </div>
                         People you follow
                         <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
-                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 1" />
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="data.visible === 'f'" />
                     </div>
-                    <div @click.prevent="ifVisibleTweetMenu = false; visibleTweet = 2;" tabindex="2"
+                    <div @click.prevent="ifVisibleTweetMenu = false; data.visible = 'p';" tabindex="2"
                         class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] flex justify-start items-center gap-2 relative">
                         <div class="bg-cyan-400 rounded-full p-2 inline-block">
                             <At fillColor="#fff" :size="22" />
                         </div>
                         Only People you mention
                         <CheckboxMarkedCircleOutline fillColor="#22d3ee" :size="20"
-                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="visibleTweet === 2" />
+                            class="absolute right-[10%] top-1/2 -translate-y-1/2" v-if="data.visible === 'p'" />
                     </div>
                 </div>
             </div>
@@ -117,13 +106,17 @@
             <!-- Points & Button to Tweeting Flex Box -->
             <div class="flex flex-row justify-between items-center h-full">
                 <div class="flex flex-row justify-between items-center gap-2 text-[#1d9bf0]">
-                    <label @click="activeHover = true" for="imageTweet" :class="showUploaded ? 'hover:bg-transparent' : ''"
+                    <label @click="activeHover = true" for="imageTweet"
+                        :class="showVideoUploaded || showImageUploaded[3] != undefined ? 'hover:bg-transparent' : ''"
                         class="hover:bg-[#0199ff1f] rounded-full p-2 flex justify-between items-center">
                         <input type="file" name="image" multiple
-                            accept=".jpg,.jpeg,.png,.gif,.mp4,.mov,.wmv,.avi,.avchd,.flv,.f4v,.swf,.mkv,.webm,.html5,.mpeg-2,.webp"
-                            id="imageTweet" @change="getFile" :disabled="showUploaded ? true : false"
-                            :readonly="showUploaded ? true : false" hidden />
-                        <ImageOutline :fillColor="showUploaded ? '#2c4556' : '#1d9bf0'" :size="18" />
+                            :accept="!showVideoUploaded && !showImageUploaded.length ? 'image/*,video/*' : 'image/*'"
+                            id="imageTweet" @change="getFile"
+                            :disabled="showVideoUploaded || showImageUploaded[3] != undefined ? true : false"
+                            :readonly="showVideoUploaded || showImageUploaded[3] != undefined ? true : false" hidden />
+                        <ImageOutline
+                            :fillColor="showVideoUploaded || showImageUploaded[3] != undefined ? '#2c4556' : '#1d9bf0'"
+                            :size="18" />
                     </label>
                     <div @click="activeHover = true"
                         class="hover:bg-transparent opacity-50 cursor-default rounded-full p-2 flex justify-between items-center">
@@ -157,7 +150,8 @@
                     <div class="w-[1px] h-4 mx-3 bg-slate-500"></div>
 
                     <!-- tweeting for tweet Button -->
-                    <button @click="storeTweet()" :disabled="!tweeting && !showUploaded ? true : false || writeLimit >= 280"
+                    <button @click="storeTweet()"
+                        :disabled="!data.tweet && !showImageUploaded.length && !showVideoUploaded ? true : false || writeLimit >= 280"
                         class="flex justify-center items-center bg-[#1d9bf0] hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 rounded-2xl transition transition-200 text-white font-semibold w-max py-1 px-3">
                         <span>Tweet</span>
                     </button>
@@ -168,8 +162,8 @@
 </template>
 
 <script setup>
-import { ref, defineProps, toRefs } from "vue";
-import { Link, router } from "@inertiajs/vue3";
+import { ref, defineProps, toRefs, reactive, onMounted } from "vue";
+import { Link, router, useForm } from "@inertiajs/vue3";
 
 import Close from "vue-material-design-icons/Close.vue";
 import ChevronDown from "vue-material-design-icons/ChevronDown.vue";
@@ -188,49 +182,49 @@ import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
 const props = defineProps({ check_auth: Boolean, user_auth: Array })
 const { check_auth, user_auth } = toRefs(props);
 
+
 // Tweet Overlay
+
 const activeHover = ref(false);
-
-const tweeting = ref("");
-
-const file = ref('');
 const ifVisibleTweetMenu = ref(false);
-const visibleTweet = ref(0);
 
-const showUploaded = ref("");
-const typeFile = ref({ type: "", ext: "" });
+// to show  what uploaded in interface only and not backend
+const showImageUploaded = ref([]);
+const showVideoUploaded = ref('');
+// should i prevent video or not
+const preventVideo = ref(false);
+// get types of the file uploaded currently with type & extension
+const typeFile = ref({ type: '', ext: '' });
 const textarea = ref(null);
 
 // get File Funcion
 function getFile(e) {
-    file.value = e.target.files[0];
     let fileG = e.target.files[0];
-    let type = fileG.type.split("/");
-
-    const usedExtsFile = [
-        "jpg",
-        "jpeg",
-        "png",
-        "gif",
-        "mp4",
-        "mov",
-        "wmv",
-        "avi",
-        "avchd",
-        "flv",
-        "f4v",
-        "swf",
-        "mkv",
-        "webm",
-        "html5",
-        "mpeg-2",
-        "webp",
-    ];
-
-    //   if this file less than 10 mb & ext in array specified
-    if (fileG.size <= 10000000 && usedExtsFile.includes(type[1])) {
-        showUploaded.value = URL.createObjectURL(fileG);
-        typeFile.value = { type: type[0], ext: type[1] };
+    if (fileG) {
+        let type = fileG.type.split("/");
+        if (type[0] === 'image') {
+            preventVideo.value = true;
+            data.is_video = 'n';
+            //   if this file less than 10 mb & ext in array specified
+            if (fileG.size <= 9000000) {
+                showImageUploaded.value.push({
+                    ima: URL.createObjectURL(fileG),
+                    filee: fileG
+                });
+                typeFile.value = { type: type[0], ext: type[1] };
+            }
+        } else {
+            preventVideo.value = false;
+            data.is_video = 'y';
+            //   if this file less than 10 mb & ext in array specified
+            if (fileG.size <= 15000000) {
+                showVideoUploaded.value = {
+                    vid: URL.createObjectURL(fileG),
+                    filee: fileG
+                };
+                typeFile.value = { type: type[0], ext: type[1] };
+            }
+        }
     }
 }
 
@@ -244,10 +238,19 @@ function heightingTweetaText(e) {
     }
 }
 
-// close image file Function
-function closeImage() {
-    showUploaded.value = "";
-    typeFile.value = { type: "", ext: "" };
+// close the video or image file Function
+function closeIV(what, image) {
+    if (what === 'image') {
+        typeFile.value = { type: "", ext: "" };
+        showImageUploaded.value = showImageUploaded.value.filter(imgObj => imgObj.ima !== image);
+    } else {
+        showVideoUploaded.value = '';
+        typeFile.value = { type: "", ext: "" };
+    }
+
+    if (!showImageUploaded.value.length && !showVideoUploaded.value) {
+        data.is_video = 'e';
+    }
 }
 
 // Control Auth Circle To Limit Writing Tweet
@@ -256,7 +259,7 @@ const showLimit = ref(false);
 const stopLimitColor = ref('#1d9bf0');
 const downLimitNum = ref(20);
 function authLimitWriting() {
-    writeLimit.value = tweeting.value.length;
+    writeLimit.value = data.tweet.length;
     writeLimit.value > 0 ? showLimit.value = true : showLimit.value = false;
     downLimitNum.value = 20 - (writeLimit.value - 260);
     if (writeLimit.value >= 260 && writeLimit.value < 280) {
@@ -272,30 +275,51 @@ function authLimitWriting() {
 }
 
 function reTweeting() {
-    visibleTweet.value = 0;
-    tweeting.value = '';
-    writeLimit.value = 0;
-    showUploaded.value = "";
-    file.value = '';
-    activeHover.value = false;
+    data.tweet = '';
+    data.file = [];
+    data.visible = 'a';
+    data.is_video = 'e';
+
+    showImageUploaded.value = [];
+    showVideoUploaded.value = '';
+    preventVideo.value = false;
     ifVisibleTweetMenu.value = false;
-    typeFile.value = { type: "", ext: "" };
+    writeLimit.value = 0;
+    activeHover.value = false;
+    typeFile.value = { type: '', ext: '' };
 }
+
+// Data Of Form
+const data = useForm({
+    tweet: '',
+    file: [],
+    visible: 'a',
+    is_video: 'e',
+    user_id: user_auth.value.id,
+})
 
 // StoreTweet Function
 const storeTweet = () => {
-    if (!tweeting.value && !showUploaded.value) return;
-    if (!user_auth.value) return;
+    if (!data.tweet && !showImageUploaded.value.length && !showVideoUploaded.value) return;
+    if (showImageUploaded.value[4] !== undefined) return;
+    if (!user_auth.value || !check_auth.value) return;
 
-    let data = new FormData();
+    if (data.is_video === 'n') {
+        // get the file for each image and push to obj var and then make file = obj
+        let obj = [];
+        showImageUploaded.value.forEach((item) => {
+            obj.push(item.filee);
+        })
 
-    data.append('tweet', tweeting.value);
-    data.append('file', file.value);
-    data.append('visible', visibleTweet.value);
-    data.append('user_id', user_auth.value.id);
+        data.file = obj;
+    } else if (data.is_video === 'y') {
+        data.file = showVideoUploaded.value.filee;
+    } else {
+        data.file = '';
+    }
 
     // send data with inertia.js on laravel
-    router.post('/tweets', data);
+    data.post('/tweets');
 
     reTweeting();
 }

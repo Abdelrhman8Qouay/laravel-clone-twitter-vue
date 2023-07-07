@@ -93,73 +93,12 @@ export const formatBytes = function(bytes, decimals = 2) {
 }
 
 
+// is scrolled into view >>> to check if the user stop on specific ele or no
+// export const isScrolledIntoView = function( element, container ) {
+//     var elementTop    = element.getBoundingClientRect().top,
+//         elementBottom = element.getBoundingClientRect().bottom;
 
-// used to generate posts for this tutorial
-var names = [{
-    'tweet': 'This My Firsst post 😀 haaaai THia aJ Kj K Jk JK k KLGNklgN  GKLN GKLN GKLN gklnKLGN gkl...',
-    'file': 'https://pbs.twimg.com/media/FxIx9QAWcAEZZHi?format=jpg&name=small',
-    'is_video': false,
-    'comments': 50,
-    'retweets': 61,
-    'likes': 1687,
-    'analytics': 5164,
-    'user': {
-        'image': 'https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png',
-        'description': 'Iam A front End Developer | FullStack (Laravel) >> aijdfk jakd jk afdkakdk jk aajs dfkj akjadf kjdak d kland aklnd klna dgklnklganlk dgkla ndkl ngkl nagklnlkagk ngk dsgakl',
-        'name': 'Qouaynt Que',
-        'handle': 'AbdelrhmanQouay',
-        'is_following': false,
-        'following': 320,
-        'followers': 1250,
-    }
-},
-{
-    'tweet': 'This My Firsst post 😀 haaaai THia aJ Kj K Jk JK k KLGNklgN  GKLN GKLN GKLN gklnKLGN gkl...',
-    'file': 'https://pbs.twimg.com/media/FxIx9QAWcAEZZHi?format=jpg&name=small',
-    'is_video': false,
-    'comments': 50,
-    'retweets': 61,
-    'likes': 1687,
-    'analytics': 5164,
-    'user': {
-        'image': 'https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png',
-        'description': 'Iam A front End Developer | FullStack (Laravel) >> aijdfk jakd jk afdkakdk jk aajs dfkj akjadf kjdak d kland aklnd klna dgklnklganlk dgkla ndkl ngkl nagklnlkagk ngk dsgakl',
-        'name': 'Qouaynt Que',
-        'handle': 'AbdelrhmanQouay',
-        'is_following': false,
-        'following': 320,
-        'followers': 1250,
-    }
-},
-{
-    'tweet': 'This Is Second Post..... The Prophet',
-    'file': './uploads/posts/videos/prophet_mousa.mp4',
-    'is_video': true,
-    'comments': 21,
-    'retweets': 61,
-    'likes': 21354687,
-    'analytics': 123454687,
-    'user': {
-        'image': 'https://scontent.fcai20-2.fna.fbcdn.net/v/t39.30808-1/349117084_767214445071603_6250451640724122341_n.jpg?stp=dst-jpg_s200x200&_nc_cat=101&ccb=1-7&_nc_sid=7206a8&_nc_ohc=yWdGL2PIhzAAX-ck0C4&_nc_ht=scontent.fcai20-2.fna&oh=00_AfDZeoCWxUWMPtFeGJx_GQiz8F1H7RSXTamvzMO5oBbroA&oe=6477B3AC',
-        'description': 'أهلاً بالجميع انا graphic designer',
-        'name': 'Mayada Ashraf',
-        'handle': 'MayadaAshraf',
-        'is_following': true,
-        'following': 604,
-        'followers': 148987,
-    }
-}
-];
-// get Fake Posts With Infinity scroll Function
-export const getPosts = (number) => {
-    // generate a number of posts
-    // in a real setting, this would be a database call or algorithm
-
-    let posts = []
-
-    for (var i = 0; i < number; i++) {
-        posts.push(names[i % names.length]);
-    }
-
-    return posts;
-  }
+//     // console.log(`window: innerHeight>>${window.innerHeight} outerHeight>>${window.outerHeight} -- ele: top>>${element.getBoundingClientRect().top} height>>${element.getBoundingClientRect().height} -- container: scrollHeight>>${container.scrollHeight} clientHeight>>${container.clientHeight} clientTop>>${container.clientTop}`);
+//     console.log(element.getBoundingClientRect().y);
+//     return elementTop >= 0 && elementBottom <= container.innerHeight;
+// }

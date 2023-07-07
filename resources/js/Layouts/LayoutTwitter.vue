@@ -9,7 +9,7 @@
         <div class="w-full relative">
             <div class="max-w-[1400px] mx-auto flex">
                 <!-- Left Part -->
-                <LeftPages :user_auth="user_auth" :check_auth="check_auth" v-once></LeftPages>
+                <LeftPages :user_auth="user_auth" v-once></LeftPages>
                 <!-- Middle Part -->
                 <div class="lg:w-[52%] max-[512px]:w-full w-11/12 h-screen border-r border-r-slate-500 relative">
                     <div class="middleS h-full">
@@ -26,7 +26,7 @@
                         <!-- Boxes Div -->
                         <div class="allBoxes w-full flex flex-col gap-3 my-3 overflow-y-auto">
                             <!-- what'is happening Box -->
-                            <div class="bg-[#202327] rounded-lg ">
+                            <div class="bg-[#202327] rounded-lg " v-if="user_auth">
                                 <span class="text-white font-bold text-lg block p-4">What’s happening</span>
                                 <div class="trendingLive h-28 hover:bg-[#d6d9db1f] p-4 flex flex-row justify-between">
                                     <div>
@@ -76,7 +76,7 @@
                             </div>
 
                             <!-- who to follow Box -->
-                            <div class="bg-[#202327] rounded-lg">
+                            <div class="bg-[#202327] rounded-lg" v-if="user_auth">
                                 <span class="text-white font-bold text-lg block p-4">Who to follow</span>
                                 <a href="#"
                                     class="w-full flex items-center gap-1 overflow-hidden py-2 px-3 hover:bg-[#d6d9db1f]">
@@ -155,7 +155,7 @@
                             </div>
 
                             <!-- New To Twitter Box -->
-                            <div class="bg-[#202327] rounded-lg" v-if="!check_auth">
+                            <div class="bg-[#202327] rounded-lg" v-if="!user_auth">
                                 <span class="text-white font-bold text-lg block px-4 pt-4">New To Twitter?</span>
                                 <p class="mb-2 px-4 font-extralight text-[13px] text-[#71767b]">Sign up now to get your own
                                     personalized timeline!</p>
@@ -163,7 +163,7 @@
                                 <div class="flex justify-center items-center py-1 px-4">
                                     <Link :href="route('register')" as="button"
                                         class="px-4 py-2 w-full mb-2 flex justify-center items-center bg-white text-black font-semibold rounded-full">
-                                    Create account {{ check_auth }}
+                                    Create account
                                     </Link>
                                 </div>
 
@@ -204,7 +204,7 @@
     </div>
 
     <!-- Login & Signup -->
-    <div class="fixed left-0 bottom-0 w-full bg-[#1d9bf0]" v-if="!check_auth">
+    <div class="fixed left-0 bottom-0 w-full bg-[#1d9bf0]" v-if="!user_auth">
         <div class="lg:w-8/12 w-screen mx-auto flex justify-between py-2">
             <div class="sm:inline-block hidden">
                 <div class="text-2xl text-white font-semibold">Don’t miss what’s happening</div>
@@ -240,9 +240,8 @@ const props = defineProps({
     pagetitle: String,
     pagename: String,
     user_auth: Array,
-    check_auth: Boolean,
 })
-const { searchinput, pagetitle, pagename, user_auth, check_auth } = toRefs(props);
+const { searchinput, pagetitle, pagename, user_auth } = toRefs(props);
 
 // For Loading Page with Animation
 const hasLoaded = ref(false);

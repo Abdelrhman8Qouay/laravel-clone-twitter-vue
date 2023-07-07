@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tweets', function (Blueprint $table) {
+        Schema::create('tweets_replies', function (Blueprint $table) {
             $table->id();
-            $table->text('tweet')->nullable();
+            $table->text('reply')->nullable();
             $table->string('file')->nullable();
             $table->enum('is_video', ['e', 'n', 'y'])->default('e'); // e >> empty, n >> no, y >> yes.
-            $table->enum('visible', ['a', 'f', 'p'])->default('a'); // a >> all, f >> friends only, p >> private.
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->unsigned();
+            $table->unsignedBigInteger('tweet_id')->unsigned();
+            $table->unsignedBigInteger('parent_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('tweet_id')->references('id')->on('tweets');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tweets');
+        Schema::dropIfExists('tweets_replies');
     }
 };

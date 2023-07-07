@@ -21,10 +21,13 @@ use App\Models\User;
 |
 */
 
+
+// Note: {name} >> send handle name of user not the name of user.
+
 // -------------- User Tweets Pages & Store & Destroy ------------
 Route::get('/', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
-Route::post('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
-Route::delete('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
+// -------------- Tweet Show ------------
+Route::get('/{name}/status/{tweet_id}', [\App\Http\Controllers\TweetController::class, 'show'])->name('tweets.show');
 
 
 // -------------- Auth Middleware Group ------------
@@ -39,6 +42,19 @@ Route::middleware('auth')->group(function () {
     Route::put('/profiling', [UserController::class, 'update'])->name('profiling.update');
     // -------------- following & followers ( attach , detach ) toggling methods -------------
     Route::post('/profilee/{user_id}/follow', [UserController::class, 'toggleFollow'])->name('users.togglefollow');
+
+
+    // -------------- Store Tweet >> Tweet class -------------
+    Route::post('/tweets', [\App\Http\Controllers\TweetController::class, 'store'])->name('tweets.store');
+    // -------------- Destroy Tweet >> Tweet class -------------
+    Route::delete('/tweets/{id}', [\App\Http\Controllers\TweetController::class, 'destroy'])->name('tweets.destroy');
+    // -------------- Likes ( attach , detach ) toggling method >> Tweet class -------------
+    Route::post('/tweets/{tweet_id}/likes', [\App\Http\Controllers\TweetController::class, 'toggleLikes'])->name('tweets.likes');
+    // -------------- Retweeting ( attach , detach ) toggling method >> Tweet class -------------
+    Route::post('/tweets/{tweet_id}/retweeting', [\App\Http\Controllers\TweetController::class, 'toggleRetweets'])->name('tweets.retweeting');
+    // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
+    Route::post('/tweets/{tweet_id}/bookmarking', [\App\Http\Controllers\TweetController::class, 'toggleBookmarks'])->name('tweets.bookmarks');
+
 
     // -------------- Profile Default Pages ------------
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

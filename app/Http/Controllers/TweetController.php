@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Tweet;
 use App\Models\User;
+// to get helper to make the slug
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Http\UploadedFile;
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,11 +17,16 @@ class TweetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $tweets = Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers', 'likes', 'retweets')->paginate(3);
 
-        dd($tweets);
+        $tweets->transform(function($tweet){
+            if($tweet->is_video === 'n') {
+                $tweet->file = unserialize($tweet->file);
+            }
+            return $tweet;
+        });
+
         if($request->wantsJson()) {
             return $tweets;
         }
@@ -32,63 +42,93 @@ class TweetController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $file = null;
+    public function store(Request $request) {
         $extension = null;
         $fileName = null;
         $path = '';
-        $imageTypes = array("png", "gif", "jpg", "jpeg", "webm", "webp");
 
-        if($request->hasFile('file')) {
-            $file = $request->file('file');
-            $request->validate(['file' => 'required|mimes:jpg,jpeg,png,gif,mp4,mov,wmv,avi,avchd,flv,f4v,swf,mkv,webm,html5,mpeg-2,webp']);
-            $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
-            in_array($extension, $imageTypes) ? $path = '/uploads/posts/pics/' : $path = '/uploads/posts/videos/';
+        if($request->input('tweet') || $request->hasFile('file')) {
+            $is_video = $request->input('is_video');
+
+            $tweet = new Tweet;
+            $tweet->tweet = $request->input('tweet');
+            $tweet->visible = $request->input('visible');
+            $tweet->user_id = $request->input('user_id');
+            $tweet->is_video = $is_video;
+
+            if($is_video === 'n') { // if file is images
+                if($request->hasFile('file')) {
+                    $fileNamesWithPath = array();
+                    $path = '/uploads/posts/pics/';
+                    $files = $request->files->get('file');
+                    // forEach file of them handle alone as an image
+                    foreach ($files as $key => $valueFile) {
+                        $extension = $valueFile->getClientOriginalExtension();
+                        $fileName = time() . '_i' . $key . '.' . $extension;
+                        // to make it as one array and send it to the database
+                        array_push($fileNamesWithPath, $path . $fileName);
+
+                        if($fileName) {
+                            $valueFile->move(public_path() . $path, $fileName);
+                        }
+                    }
+                    // store to the column with serialize() method to make it as array in database and should use unserialize() method when call this column again
+                    $tweet->file = serialize($fileNamesWithPath);
+                }
+            } elseif ($is_video === 'y') { // if file is video
+                $file = null;
+                $videoFileName = null;
+                if($request->hasFile('file')) {
+                    $path = '/uploads/posts/videos/';
+                    $file = $request->file('file');
+                    $request->validate(['file' => 'required|mimes:jpg,jpeg,png,gif,mp4,mov,wmv,avi,avchd,flv,f4v,swf,mkv,webm,html5,mpeg-2,webp']);
+                    $extension = $file->getClientOriginalExtension();
+                    $videoFileName = time() . '.' . $extension;
+
+                    if($videoFileName) {
+                        $tweet->file = $path . $videoFileName;
+                        $file->move(public_path() . $path, $videoFileName);
+                    }
+                }
+            }
+
+            $tweet->save();
         }
-
-        $tweet = new Tweet;
-
-        $tweet->tweet = $request->input('tweet');
-        $tweet->visible = $request->input('visible');
-        $tweet->user_id = $request->input('user_id');
-        if($fileName) {
-            $tweet->file = $path . $fileName;
-            $tweet->is_video = in_array($extension, $imageTypes) ? false : true;
-            $file->move(public_path() . $path, $fileName);
-        }
-        $tweet->comments = 0;
-        $tweet->retweets = 0;
-        $tweet->likes = 0;
-        $tweet->analytics = 0;
-
-        $tweet->save();
         return redirect()->back();
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified tweet.
      */
-    public function show(Tweet $tweet)
+    public function show($name, $tweet_id)
     {
-        //
+        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets')->get()->transform(function($tweet){
+            if($tweet->is_video === 'n') {
+                $tweet->file = unserialize($tweet->file);
+            }
+            return $tweet;
+        })->find($tweet_id);
+
+        return Inertia::render('Tweets/Show', [
+            'tweet' => $tweeta,
+            'user_following_count' => $tweeta->user->followers->count(),
+            'user_followers_count' => $tweeta->user->following->count(),
+            'user_auth' => auth()->user(),
+        ]);
     }
 
     /**
      * Attach & Detach (toggle) user likes.
      */
-    public function toggleLikes(Tweet $tweet)
-    {
-        $tweet->likes()->toggle(auth()->user()->id);
+    public function toggleLikes($tweet) {
+        Tweet::where('id', '=',$tweet)->first()->likes()->toggle(auth()->id());
 
         return redirect()->back();
     }
@@ -96,9 +136,17 @@ class TweetController extends Controller
     /**
      * Attach & Detach (toggle) user retweets.
      */
-    public function toggleRetweets(Tweet $tweet)
-    {
-        $tweet->retweets()->toggle(auth()->user()->id);
+    public function toggleRetweets($tweet) {
+        Tweet::where('id', '=',$tweet)->first()->retweets()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user retweets.
+     */
+    public function toggleBookmarks($tweet) {
+        Tweet::where('id', '=',$tweet)->first()->bookmarks()->toggle(auth()->id());
 
         return redirect()->back();
     }
@@ -106,24 +154,21 @@ class TweetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tweet $tweet)
-    {
+    public function edit(Tweet $tweet) {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tweet $tweet)
-    {
+    public function update(Request $request, Tweet $tweet) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         $tweet = Tweet::find($id);
 
         if (!is_null($tweet->file) && file_exists(public_path() . $tweet->file)) {

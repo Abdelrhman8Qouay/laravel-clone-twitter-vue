@@ -28,33 +28,5 @@ class TweetsSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
-        DB::table('tweets')->insert([
-            'tweet'=> 'The Prophet Mousa with the God.',
-            'file'=> '/uploads/posts/videos/prophet_mousa.mp4',
-            'is_video'=> true,
-            'comments'=> 12,
-            'retweets'=> 94,
-            'likes'=> 15648,
-            'analytics'=> 1354687,
-            'image'=> 'https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png',
-            'name'=> 'Qouaynt Que',
-            'handle'=> 'AbdelrhmanQouay',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('tweets')->insert([
-            'tweet'=> 'Hi Guys before anything...  GKLN GKLN GKLN gklnKLGN gkl...',
-            'file'=> '/uploads/posts/pics/the_legend_of_zelda.jpg',
-            'is_video'=> false,
-            'comments'=> 50,
-            'retweets'=> 61,
-            'likes'=> 1687,
-            'analytics'=> 5164,
-            'image'=> 'https://pbs.twimg.com/profile_images/1625184499582615563/XdG9pB_s_400x400.png',
-            'name'=> 'Qouaynt Que',
-            'handle'=> 'AbdelrhmanQouay',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
     }
 }

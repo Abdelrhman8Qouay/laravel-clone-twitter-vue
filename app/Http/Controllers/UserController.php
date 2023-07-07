@@ -29,15 +29,14 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($name)
-    {
+    public function show($name) {
         $userUsed = User::where('handle_name', '=',$name)->first();
 
         return Inertia::render('Profiling/Show', [
             'user_own' => $userUsed,
             'user_followers' => $userUsed->followers()->count(),
             'user_following' => $userUsed->following()->count(),
-            'tweets_own' => Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers')->get()->where('user_id', '=',$userUsed->id),
+            'tweets_own' => Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers', 'likes', 'retweets')->get()->where('user_id', '=',$userUsed->id),
             'check_auth' => auth()->check(),
             'user_auth' => auth()->user(),
         ]);
@@ -46,8 +45,7 @@ class UserController extends Controller
     /**
      * Display all followers or all following from users.
      */
-    public function showFollowingFollowers($name, $what)
-    {
+    public function showFollowingFollowers($name, $what) {
         $userUsed = User::where('handle_name', '=',$name)->first();
         $arrPage = [];
 
@@ -85,8 +83,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
-    {
+    public function update(Request $request) {
         // get user from user auth who can edit the profile of him only and this user only what i want to access on it
         $user = User::find(auth()->user()->id);
 
