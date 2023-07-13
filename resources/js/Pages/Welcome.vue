@@ -11,10 +11,9 @@
                         <LinkHeaderLayout pagecompare="/following" title="Following" />
                     </HeaderMain>
                     <!-- New Post Tweet -->
-                    <NewTweetaGround v-if="check_auth" :check_auth="check_auth" :user_auth="user_auth" />
+                    <NewTweetaGround v-if="user_auth" />
                     <!-- All Posts -->
-                    <Tweeta v-for="(post, i) in tweetsPosted" :key="i" :tweet="post" :user_auth="user_auth"
-                        :check_auth="check_auth" :parent_scroll="parent_scroll"
+                    <Tweeta v-for="(post, i) in tweetsPosted" :key="i" :tweet="post" :parent_scroll="parent_scroll"
                         @getimg="(bol, imgData) => { openImgFullScreen = bol; imgPostFullSData = imgData }" />
                 </InfiniteScrolling>
             </template>
@@ -30,7 +29,7 @@
 
 <script setup>
 import { ref, onMounted, watchEffect, toRefs, defineProps } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
@@ -43,8 +42,9 @@ import LoaderFloating from "@/Components/LoaderFloating.vue";
 
 import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
 
-const props = defineProps({ tweets: Array, user_auth: Array, check_auth: Boolean })
-const { tweets, user_auth, check_auth } = toRefs(props);
+const props = defineProps({ tweets: Array })
+const { tweets } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 const loaderFloatShow = ref(false);
 

@@ -226,7 +226,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeMount, defineProps, toRefs, nextTick, defineEmits } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 
 import LeftPages from "@/Layouts/LeftPages.vue";
 
@@ -239,9 +239,9 @@ const props = defineProps({
     searchinput: Boolean,
     pagetitle: String,
     pagename: String,
-    user_auth: Array,
 })
-const { searchinput, pagetitle, pagename, user_auth } = toRefs(props);
+const { searchinput, pagetitle, pagename } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 // For Loading Page with Animation
 const hasLoaded = ref(false);

@@ -2,7 +2,7 @@
     <main>
         <LayoutTwitter searchinput="true"
             :pagetitle="$page.url === '/profilee/' + user_own.handle_name + '/following' ? `People followed by ${user_own.name}` : `People following by ${user_own.name}`"
-            pagename="Connect" :user_auth="user_auth" :check_auth="check_auth">
+            pagename="Connect" :user_auth="user_auth">
             <!-- Content Slot Here -->
             <template #content>
                 <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
@@ -80,7 +80,7 @@
 
 <script setup>
 import { ref, computed, defineProps, toRefs } from "vue";
-import { Link, router, useForm } from "@inertiajs/vue3";
+import { Link, router, useForm, usePage } from "@inertiajs/vue3";
 
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
 import ArrowLeft from "vue-material-design-icons/ArrowLeft.vue";
@@ -94,8 +94,9 @@ import LoaderFloating from "@/Components/LoaderFloating.vue";
 
 const loaderFloatShow = ref(false);
 
-const props = defineProps({ user_auth: Array, user_follows: Array, user_own: Array, check_auth: Boolean })
-const { user_auth, user_follows, user_own, check_auth } = toRefs(props);
+const props = defineProps({ user_follows: Array, user_own: Array })
+const { user_follows, user_own } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 // Get Posts And Create
 const usersExisted = computed(() => user_follows.value.data);

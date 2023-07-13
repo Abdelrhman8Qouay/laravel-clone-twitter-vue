@@ -10,6 +10,8 @@ use Inertia\Inertia;
 use App\Models\Tweet;
 use App\Models\User;
 
+define('PAGINATION_COUNT', 10);
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -54,6 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/tweets/{tweet_id}/retweeting', [\App\Http\Controllers\TweetController::class, 'toggleRetweets'])->name('tweets.retweeting');
     // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
     Route::post('/tweets/{tweet_id}/bookmarking', [\App\Http\Controllers\TweetController::class, 'toggleBookmarks'])->name('tweets.bookmarks');
+    // -------------- add reply for tweet >> Reply class -------------
+    Route::post('/tweets/{tweet_id}/addreply', [\App\Http\Controllers\ReplyController::class, 'store'])->name('replies.store');
 
 
     // -------------- Profile Default Pages ------------

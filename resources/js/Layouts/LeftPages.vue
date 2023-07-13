@@ -272,7 +272,7 @@
 
 <script setup>
 import { ref, defineProps, toRefs } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 
 import Item from "@/Components/ItemLeft.vue";
 import TwitterLogo from "vue-material-design-icons/Twitter.vue";
@@ -296,8 +296,9 @@ import MapMarkerOutline from "vue-material-design-icons/MapMarkerOutline.vue";
 import AccountTag from "vue-material-design-icons/AccountTag.vue";
 import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
 
-const props = defineProps({ user_auth: Array })
-const { user_auth } = toRefs(props);
+// const props = defineProps({  })
+// const {  } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 const ifUserMenu = ref(false);
 

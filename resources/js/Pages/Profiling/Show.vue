@@ -91,8 +91,7 @@
                     </div>
 
                     <!-- All User Posts -->
-                    <Tweeta v-for="(post, i) in tweets_own" :key="i" :tweet="post" :user_auth="user_auth"
-                        :check_auth="check_auth" />
+                    <Tweeta v-for="(post, i) in tweets_own" :key="i" :tweet="post" />
 
                     <!-- Loader Section -->
                     <div v-show="loaderShow" class="w-full h-max p-3 flex justify-center items-center">
@@ -213,7 +212,7 @@
 
 <script setup>
 import { ref, onMounted, defineProps, toRefs, watchEffect } from "vue";
-import { Link, router, useForm } from "@inertiajs/vue3";
+import { Link, router, useForm, usePage } from "@inertiajs/vue3";
 
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
 import HeaderMain from "@/Components/HeaderMain.vue";
@@ -249,14 +248,13 @@ onMounted(() => {
 
 // -------------------------------------------------------------------------------------------------- Get Posts And Create
 const props = defineProps({
-    user_auth: Array,
-    check_auth: Boolean,
     user_own: Array,
     tweets_own: Array,
     user_followers: Number,
     user_following: Number,
 });
-const { user_auth, check_auth, user_own, tweets_own, user_followers, user_following } = toRefs(props);
+const { user_own, tweets_own, user_followers, user_following } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 // -------------------------------------------------------------------------------------------------- Overlay
 // Open Boxes
@@ -351,7 +349,7 @@ const formUpdate = useForm({
 // StoreTweet Function
 const storeEdited = () => {
     if (!changed) return;
-    if (!user_auth.value || !user_own.value) return;
+    if (!user_auth || !user_own.value) return;
 
     formUpdate.post(route('profiling.update'));
 

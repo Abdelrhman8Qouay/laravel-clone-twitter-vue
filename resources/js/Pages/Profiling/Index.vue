@@ -1,7 +1,6 @@
 <template>
     <main>
-        <LayoutTwitter searchinput="true" pagetitle="Connect / Twitter" pagename="Connect" :user_auth="user_auth"
-            :check_auth="check_auth">
+        <LayoutTwitter searchinput="true" pagetitle="Connect / Twitter" pagename="Connect">
             <!-- Content Slot Here -->
             <template #content>
                 <div class="w-full h-full MiddleScroll overflow-y-auto" ref="scrollComponent">
@@ -24,7 +23,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted, defineProps, toRefs } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import { useInfiniteScroll } from '@vueuse/core';
 
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
@@ -41,7 +41,10 @@ const currentScroll = ref(null);
 
 
 // Get Posts And Create
-defineProps({ user_auth: Array, all_users: Array, check_auth: Boolean })
+const props = defineProps({ all_users: Array });
+const { all_users } = toRefs(props);
+const user_auth = usePage().props.auth.user;
+
 // const posts = ref(getPosts(10));
 // const scrollComponent = ref(null);
 // // Force Render Components

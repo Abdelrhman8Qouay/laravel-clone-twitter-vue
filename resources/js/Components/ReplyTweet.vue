@@ -50,7 +50,7 @@
         </div>
         <!-- Comment post Div -->
         <div class="text-white font-light text-sm mt-2 max-[320px]:text-xs">
-            <span class="break-words">{{ tweet.tweet }}</span>
+            <span class="break-words">{{ tweet.reply }}</span>
         </div>
 
         <!-- File Post Div -->
@@ -80,7 +80,7 @@
         </div>
 
         <!-- Points Of Post Div -->
-        <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
+        <!-- <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
             <div class="cursor-pointer flex-1 flex justify-between items-center group">
                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
                     <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
@@ -123,7 +123,7 @@
                     <Share class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
     </Link>
 
@@ -182,7 +182,7 @@
 
 <script setup>
 import { ref, defineProps, toRefs, watchEffect, computed, onMounted } from "vue";
-import { Head, Link, router, usePage } from "@inertiajs/vue3";
+import { Link, router, usePage } from "@inertiajs/vue3";
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
@@ -208,32 +208,31 @@ import Share from "vue-material-design-icons/Share.vue";
 import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
 
 
-const props = defineProps({ tweet: Object, parent_scroll: Object });
+const props = defineProps({ tweet: Array, parent_scroll: Object });
 const { tweet, parent_scroll } = toRefs(props);
 const user_auth = usePage().props.auth.user;
-
 
 const ifTweetMenu = ref(false);
 
 // -------------------------- Part ------------------------------------------
 // Points Of User Tweeta
-const is_following = ref(false);
-const has_liked = ref(false);
-const has_retweeted = ref(false);
-onMounted(() => {
-    if (user_auth) {
-        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
-        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
-        has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
-    } else {
-        is_following.value = false;
-        has_liked.value = false;
-        has_retweeted.value = false;
-    }
-})
-// Live Numbers Of Points For The Tweeta
-const likesNum = ref(tweet.value.likes.length);
-const RetweetsNum = ref(tweet.value.retweets.length);
+// const is_following = ref(false);
+// const has_liked = ref(false);
+// const has_retweeted = ref(false);
+// onMounted(() => {
+//     if (user_auth) {
+//         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+//         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+//         has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
+//     } else {
+//         is_following.value = false;
+//         has_liked.value = false;
+//         has_retweeted.value = false;
+//     }
+// })
+// // Live Numbers Of Points For The Tweeta
+// const likesNum = ref(tweet.value.likes.length);
+// const RetweetsNum = ref(tweet.value.retweets.length);
 
 // -------------------------- Part ------------------------------------------
 // Control Video

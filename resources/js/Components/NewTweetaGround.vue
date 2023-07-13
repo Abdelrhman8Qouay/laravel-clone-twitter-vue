@@ -163,7 +163,7 @@
 
 <script setup>
 import { ref, defineProps, toRefs, reactive, onMounted } from "vue";
-import { Link, router, useForm } from "@inertiajs/vue3";
+import { Link, router, useForm, usePage } from "@inertiajs/vue3";
 
 import Close from "vue-material-design-icons/Close.vue";
 import ChevronDown from "vue-material-design-icons/ChevronDown.vue";
@@ -179,8 +179,9 @@ import MapMarkerOutline from "vue-material-design-icons/MapMarkerOutline.vue";
 import AccountTag from "vue-material-design-icons/AccountTag.vue";
 import ListBoxOutline from "vue-material-design-icons/ListBoxOutline.vue";
 
-const props = defineProps({ check_auth: Boolean, user_auth: Array })
-const { check_auth, user_auth } = toRefs(props);
+// const props = defineProps({ })
+// const {  } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
 
 // Tweet Overlay
@@ -295,14 +296,14 @@ const data = useForm({
     file: [],
     visible: 'a',
     is_video: 'e',
-    user_id: user_auth.value.id,
+    user_id: user_auth.id,
 })
 
 // StoreTweet Function
 const storeTweet = () => {
     if (!data.tweet && !showImageUploaded.value.length && !showVideoUploaded.value) return;
     if (showImageUploaded.value[4] !== undefined) return;
-    if (!user_auth.value || !check_auth.value) return;
+    if (!user_auth) return;
 
     if (data.is_video === 'n') {
         // get the file for each image and push to obj var and then make file = obj

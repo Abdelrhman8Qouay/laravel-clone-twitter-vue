@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Collection;
+
+use App\Models\Reply;
 use App\Models\Tweet;
 use App\Models\User;
 // to get helper to make the slug
@@ -12,20 +15,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use function PHPSTORM_META\type;
+
 class TweetController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request) {
-        $tweets = Tweet::orderBy('id', 'desc')->with('user.following', 'user.followers', 'likes', 'retweets')->paginate(3);
-
-        $tweets->transform(function($tweet){
-            if($tweet->is_video === 'n') {
-                $tweet->file = unserialize($tweet->file);
-            }
-            return $tweet;
-        });
+        $tweets = Tweet::latest('created_at')->latest('id')->with('user.following', 'user.followers', 'likes', 'retweets')->paginate(PAGINATION_COUNT);
 
         if($request->wantsJson()) {
             return $tweets;
@@ -79,8 +77,8 @@ class TweetController extends Controller
                             $valueFile->move(public_path() . $path, $fileName);
                         }
                     }
-                    // store to the column with serialize() method to make it as array in database and should use unserialize() method when call this column again
-                    $tweet->file = serialize($fileNamesWithPath);
+                    // store as string with split them with (|) to get them again simply
+                    $tweet->file = implode("|", $fileNamesWithPath);
                 }
             } elseif ($is_video === 'y') { // if file is video
                 $file = null;
@@ -101,27 +99,30 @@ class TweetController extends Controller
 
             $tweet->save();
         }
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Successful Tweet Posted');
     }
 
     /**
      * Display the specified tweet.
      */
-    public function show($name, $tweet_id)
-    {
-        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets')->get()->transform(function($tweet){
-            if($tweet->is_video === 'n') {
-                $tweet->file = unserialize($tweet->file);
-            }
-            return $tweet;
-        })->find($tweet_id);
+    public function show(Request $request ,$name, $tweet_id) {
+        // get all tweets
+        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets', 'bookmarks')->get()->find($tweet_id);
+
+        // get all replies of this tweet
+        $replies = Reply::latest('created_at')->latest('id')->where('tweet_id', $tweet_id)->with('user','user.following', 'user.followers', 'tweet', 'replies')->paginate(PAGINATION_COUNT);
+        if($request->wantsJson()) {
+            return $replies;
+        }
 
         return Inertia::render('Tweets/Show', [
             'tweet' => $tweeta,
+            'replies' => $replies,
             'user_following_count' => $tweeta->user->followers->count(),
             'user_followers_count' => $tweeta->user->following->count(),
-            'user_auth' => auth()->user(),
         ]);
+
+        return redirect()->refresh();
     }
 
     /**

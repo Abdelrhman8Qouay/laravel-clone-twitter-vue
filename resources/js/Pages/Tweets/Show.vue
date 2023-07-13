@@ -1,6 +1,7 @@
 <template>
     <main>
-        <LayoutTwitter searchinput="false" pagetitle="Home/Twitter" pagename="Home" :user_auth="user_auth">
+        <LayoutTwitter searchinput="false" :pagetitle="`${tweet.user.name} on Tweeter: '${tweet.tweet}'`" pagename="Home"
+            :user_auth="user_auth">
             <!-- Content Slot Here -->
             <template #content>
 
@@ -90,8 +91,9 @@
                                 <div v-for="(img, i) in tweet.file" :key="i" class="relative"
                                     :class="tweet.file.length >= 3 ? 'w-[150px] h-[150px]' : 'w-full h-full'"
                                     :style="tweet.file.length >= 3 ? 'flex: 1 1 45%' : 'flex: 1 1 0%'">
-                                    <img @click="$emit('getimg', true, img)" class="w-full h-full object-cover rounded-2xl"
-                                        :src="img" :alt="'image: ' + i + 1" />
+                                    <img @click="openImgFullScreen = true, imgPostFullSData = img"
+                                        class="w-full h-full object-cover rounded-2xl" :src="img"
+                                        :alt="'image: ' + i + 1" />
                                 </div>
                             </div>
                         </div>
@@ -138,15 +140,16 @@
                             </Link>
                             <Link href="/"
                                 class="text-gray-400 text-sm font-extralight cursor-pointer mr-3 inline-flex gap-1 items-center">
-                            <span class="font-bold mx-1 text-white">1200</span>Likes
+                            <span class="font-bold mx-1 text-white">{{ formatNumber(bookedNum) }}</span>Bookmarks
                             </Link>
                         </div>
 
                         <!-- Twitter Divider -->
-                        <div class="w-full h-[1px] bg-slate-500 mt-4"></div>
+                        <div v-if="user_auth" class="w-full h-[1px] bg-slate-500 mt-4"></div>
 
                         <!-- Points Of Post Div -->
-                        <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-4 overflow-hidden">
+                        <div v-if="user_auth"
+                            class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-4 overflow-hidden">
                             <div class="cursor-pointer flex-1 flex justify-between items-center group">
                                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
                                     <MessageOutline fillColor="#000" class="stroke-gray-500 group-hover:stroke-blue-500"
@@ -175,12 +178,16 @@
                                     class="stroke-gray-500 group-hover:stroke-rose-600" :size="20" />
                             </div>
                             </Link>
-                            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                                    <BookmarkBox class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000"
-                                        :size="20" />
-                                </div>
+                            <Link as="button" method="post" :href="route('tweets.bookmarks', { tweet_id: tweet.id })"
+                                preserve-scroll
+                                @click="has_booked = !has_booked, has_booked ? bookedNum += 1 : bookedNum -= 1"
+                                class="flex-1 flex justify-between items-center group"
+                                :title="has_booked ? 'remove tweet from bookmarks' : 'bookmark'">
+                            <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff31]">
+                                <Bookmark :fillColor="has_booked ? '#3b82f6' : '#000'"
+                                    class="stroke-gray-500 group-hover:stroke-blue-500" :size="20" />
                             </div>
+                            </Link>
                             <div class=" cursor-pointer flex-1 flex justify-between items-center group">
                                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
                                     <Share class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000"
@@ -190,16 +197,23 @@
                         </div>
 
                         <!-- Twitter Divider -->
-                        <div class="w-full h-[1px] bg-slate-500 mt-2"></div>
+                        <div v-if="user_auth" class="w-full h-[1px] bg-slate-500 mt-2"></div>
+
+                        <!-- New Reply Comp -->
+                        <div v-if="user_auth" class="mt-2">
+                            <NewReply :tweet="tweet" />
+                        </div>
                     </div>
                 </div>
                 <!-- Infinite Div Content -->
-                <!-- <InfiniteScrolling :loadMore="loadMoreFunc" class="w-full h-full MiddleScroll overflow-y-auto"
-                    @whenScroll="(parent) => parent_scroll = parent"> -->
-                <!-- New Post Tweet -->
-                <!-- <NewTweetaGround v-if="user_auth" :user_auth="user_auth" /> -->
-                <!-- All Comments replayed -->
-                <!-- </InfiniteScrolling> -->
+                <InfiniteScrolling :loadMore="loadMoreFunc" class="w-full h-full MiddleScroll overflow-y-auto"
+                    @whenScroll="(parent) => parent_scroll = parent">
+                    <!-- New Post Tweet -->
+                    <ReplyTweet v-for="(reply, i) in repliesTweetPosted" :key="i" :tweet="reply"
+                        :parent_scroll="parent_scroll"
+                        @getimg="(bol, imgData) => { openImgFullScreen = bol; imgPostFullSData = imgData }" />
+                    <!-- All Comments replayed -->
+                </InfiniteScrolling>
             </template>
         </LayoutTwitter>
     </main>
@@ -269,7 +283,7 @@
 
 <script setup>
 import { ref, onMounted, watchEffect, toRefs, defineProps, computed } from "vue";
-import { Link, router } from "@inertiajs/vue3";
+import { Link, router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
@@ -283,41 +297,43 @@ import InfiniteScrolling from "@/Components/InfiniteScrolling.vue";
 import NewTweetaGround from "@/Components/NewTweetaGround.vue";
 import Tweeta from "@/Components/Tweeta.vue";
 import LoaderFloating from "@/Components/LoaderFloating.vue";
+import NewReply from "@/Components/NewReply.vue";
+import ReplyTweet from "@/Components/ReplyTweet.vue";
 
 import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
 
-const props = defineProps({ tweet: Array, user_auth: Array, user_following_count: Number, user_followers_count: Number })
-const { tweet, user_auth, user_following_count, user_followers_count } = toRefs(props);
+const props = defineProps({ tweet: Array, replies: Object, user_following_count: Number, user_followers_count: Number })
+const { tweet, replies, user_following_count, user_followers_count } = toRefs(props);
+const user_auth = usePage().props.auth.user;
 
+console.log(replies.value)
+//------------------------------------------------ Loader Float
 const loaderFloatShow = ref(false);
-
-const parent_scroll = ref(null);
-
-
+//------------------------------------------------ Show Image Post
 // Show Image Post Full Screen
 const openImgFullScreen = ref(false);
 const imgPostFullSData = ref('');
+//------------------------------------------------ Infinite Scroll Operations
+const parent_scroll = ref(null);
+// Get Posts And Create
+const repliesTweetPosted = ref(replies.value.data);
+const next_page_num = ref(replies.value.next_page_url);
+// const loaderPostsShow = ref(false);
+const loadMoreFunc = () => {
+    if (!next_page_num.value) {
+        // console.log('End Request With Promise');
+        Promise.resolve();
+        return false;
+    }
 
+    axios.get(next_page_num.value)
+        .then((res) => {
+            repliesTweetPosted.value.push(...res.data.data); // 👈 get just results
+            next_page_num.value = res.data.next_page_url;
+        });
 
-// // Get Posts And Create
-// const tweetsPosted = ref(tweets.value.data);
-// const next_page_num = ref(tweets.value.next_page_url);
-// // const loaderPostsShow = ref(false);
-// const loadMoreFunc = () => {
-//     if (!next_page_num.value) {
-//         // console.log('End Request With Promise');
-//         Promise.resolve();
-//         return false;
-//     }
-
-//     axios.get(next_page_num.value)
-//         .then((res) => {
-//             tweetsPosted.value.push(...res.data.data); // 👈 get just results
-//             next_page_num.value = res.data.next_page_url;
-//         });
-
-//     return false;
-// }
+    return false;
+}
 
 
 
@@ -329,7 +345,7 @@ import Play from "vue-material-design-icons/Play.vue";
 import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
-import BookmarkBox from "vue-material-design-icons/BookmarkBox.vue";
+import Bookmark from "vue-material-design-icons/Bookmark.vue";
 import Share from "vue-material-design-icons/Share.vue";
 import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
 
@@ -340,21 +356,24 @@ const ifTweetMenu = ref(false);
 const is_following = ref(false);
 const has_liked = ref(false);
 const has_retweeted = ref(false);
+const has_booked = ref(false);
 onMounted(() => {
-    if (user_auth.value) {
-        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.value.id);
-        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.value.id);
-        has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.value.id);
+    if (user_auth) {
+        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+        has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
+        has_booked.value = tweet.value.bookmarks.some(userRet => userRet.id === user_auth.id);
     } else {
         is_following.value = false;
         has_liked.value = false;
         has_retweeted.value = false;
+        has_booked.value = false;
     }
-    console.log(has_liked.value);
 })
 // Live Numbers Of Points For The Tweeta
 const likesNum = ref(tweet.value.likes.length);
 const RetweetsNum = ref(tweet.value.retweets.length);
+const bookedNum = ref(tweet.value.bookmarks.length);
 
 // -------------------------- Part ------------------------------------------
 // Control Video
@@ -399,6 +418,8 @@ async function whenGoHover(e) {
 async function whenLeaveHover() {
     hoverSection.value.classList.remove('showVisible');
 }
+
+// --------------------------------------------------------------------- Add Reply Tweet Section
 </script>
 
 <style></style>
