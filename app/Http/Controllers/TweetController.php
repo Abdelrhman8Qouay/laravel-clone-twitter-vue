@@ -23,14 +23,13 @@ class TweetController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request) {
-        $tweets = Tweet::latest('created_at')->latest('id')->with('user.following', 'user.followers', 'likes', 'retweets')->paginate(PAGINATION_COUNT);
+        $tweets = Tweet::latest('created_at')->latest('id')->with('user.following', 'user.followers','likes','retweets','viewed')->withCount('replies')->paginate(PAGINATION_COUNT);
 
         if($request->wantsJson()) {
             return $tweets;
         }
 
         return Inertia::render('Welcome', [
-            // 'tweets' => Tweet::orderBy('id', 'desc')->with('user')->get(),
             'tweets' => $tweets,
             'check_auth' => auth()->check(),
             'user_auth' => auth()->user(),
@@ -107,10 +106,10 @@ class TweetController extends Controller
      */
     public function show(Request $request ,$name, $tweet_id) {
         // get all tweets
-        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets', 'bookmarks')->get()->find($tweet_id);
+        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets', 'bookmarks')->withCount('viewed')->get()->find($tweet_id);
 
         // get all replies of this tweet
-        $replies = Reply::latest('created_at')->latest('id')->where('tweet_id', $tweet_id)->with('user','user.following', 'user.followers', 'tweet', 'replies')->paginate(PAGINATION_COUNT);
+        $replies = Reply::latest('created_at')->latest('id')->where('tweet_id', $tweet_id)->with('user','user.following', 'user.followers', 'tweet', 'replies','likes','bookmarks','viewed')->paginate(PAGINATION_COUNT);
         if($request->wantsJson()) {
             return $replies;
         }
@@ -144,10 +143,28 @@ class TweetController extends Controller
     }
 
     /**
-     * Attach & Detach (toggle) user retweets.
+     * Attach & Detach (toggle) user bookmarks.
      */
     public function toggleBookmarks($tweet) {
         Tweet::where('id', '=',$tweet)->first()->bookmarks()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user viewed.
+     */
+    public function toggleViewed($tweet) {
+        Tweet::where('id', '=',$tweet)->first()->viewed()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user pinned.
+     */
+    public function togglePin($tweet) {
+        Tweet::where('id', '=',$tweet)->first()->pin()->toggle(auth()->id());
 
         return redirect()->back();
     }

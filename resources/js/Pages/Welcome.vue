@@ -7,11 +7,11 @@
                     @whenScroll="(parent) => parent_scroll = parent">
                     <!-- Header Content -->
                     <HeaderMain title="Home" logoHere="true">
-                        <LinkHeaderLayout pagecompare="/" title="for you" />
-                        <LinkHeaderLayout pagecompare="/following" title="Following" />
+                        <LinkHeaderLayout pagecompare="/home" title="for you" />
+                        <LinkHeaderLayout pagecompare="/home/following" title="following" />
                     </HeaderMain>
                     <!-- New Post Tweet -->
-                    <NewTweetaGround v-if="user_auth" />
+                    <NewTweet v-if="user_auth" :is_overlay="false" />
                     <!-- All Posts -->
                     <Tweeta v-for="(post, i) in tweetsPosted" :key="i" :tweet="post" :parent_scroll="parent_scroll"
                         @getimg="(bol, imgData) => { openImgFullScreen = bol; imgPostFullSData = imgData }" />
@@ -36,7 +36,7 @@ import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
 import HeaderMain from "@/Components/HeaderMain.vue";
 import ShowImgFullScreen from "@/Components/ShowImgFullScreen.vue";
 import InfiniteScrolling from "@/Components/InfiniteScrolling.vue";
-import NewTweetaGround from "@/Components/NewTweetaGround.vue";
+import NewTweet from "@/Components/NewTweet.vue";
 import Tweeta from "@/Components/Tweeta.vue";
 import LoaderFloating from "@/Components/LoaderFloating.vue";
 
@@ -45,6 +45,8 @@ import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
 const props = defineProps({ tweets: Array })
 const { tweets } = toRefs(props);
 const user_auth = usePage().props.auth.user;
+
+// console.log($routes);
 
 const loaderFloatShow = ref(false);
 

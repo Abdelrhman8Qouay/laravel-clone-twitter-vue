@@ -27,4 +27,19 @@ class Reply extends Model
     public function replies() {
         return $this->hasMany( self::class, 'parent_id', 'id' );
     }
+
+
+
+    public function likes() {
+        return $this->belongsToMany( User::class, 'replies_likes' )->withTimestamps();
+    }
+
+    public function viewed() {
+        return $this->belongsToMany( User::class, 'replies_viewed' )->withTimestamps();
+    }
+
+    public function bookmarks() {
+        return $this->belongsToMany( User::class, 'replies_bookmarks')->withTimestamps();
+    }
+
 }

@@ -67,4 +67,31 @@ class ReplyController extends Controller
         }
         return redirect()->back();
     }
+
+    /**
+     * Attach & Detach (toggle) user likes.
+     */
+    public function toggleLikes($reply) {
+        Reply::where('id', '=',$reply)->first()->likes()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user bookmarks.
+     */
+    public function toggleBookmarks($reply) {
+        Reply::where('id', '=',$reply)->first()->bookmarks()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
+
+    /**
+     * Attach & Detach (toggle) user viewed.
+     */
+    public function toggleViewed($reply) {
+        Reply::where('id', '=',$reply)->first()->viewed()->toggle(auth()->id());
+
+        return redirect()->back();
+    }
 }

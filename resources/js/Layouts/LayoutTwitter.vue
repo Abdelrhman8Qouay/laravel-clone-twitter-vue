@@ -11,7 +11,7 @@
                 <!-- Left Part -->
                 <LeftPages :user_auth="user_auth" v-once></LeftPages>
                 <!-- Middle Part -->
-                <div class="lg:w-[52%] max-[512px]:w-full w-11/12 h-screen border-r border-r-slate-500 relative">
+                <div class="w-[650px] h-screen border-r border-r-slate-500 relative">
                     <div class="middleS h-full">
                         <!-- Container Of Posts -->
                         <slot name="content">Fallback Content</slot>

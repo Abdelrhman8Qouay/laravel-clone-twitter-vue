@@ -1,131 +1,127 @@
 <template>
-    <Link :href="route('tweets.show', { name: tweet.user.handle_name, tweet_id: tweet.id })"
-        class="w-full flex overflow-hidden border-b border-b-slate-500 cursor-pointer p-2">
-    <!-- Image User Avatar -->
-    <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
-        ref="userImageTweeta">
-        <Link :href="route('profiling.show', { name: tweet.user.handle_name })">
-        <img :src="tweet.user.avatar"
-            class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[45px] min-h-[45px]"
-            :alt="tweet.name" />
-        </Link>
-    </div>
-    <!-- All Content of Post -->
-    <div class="w-[calc(100%-55px)] flex-1 h-full mx-1">
-        <!-- Title Top -->
-        <div class="flex flex-row justify-between items-center w-full">
-            <div class="flex justify-start items-center text-base truncate">
-                <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
-                    class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
-                    @mouseleave="whenLeaveHover" ref="userNameTweeta">
-                {{ tweet.user.name }}
-                </Link>
-                <div class="Mark inline-block pl-2" v-if="tweet.user.blue_mark">
-                    <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
-                </div>
-                <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
-                    class="text-gray-400 font-light inline-block truncate pl-2" @mouseover="whenGoHover"
-                    @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{ tweet.user.handle_name }}
-                </Link>
-                <span class="px-2 text-gray-400">.</span>
-                <span class="text-gray-400 font-light hover:underline"
-                    :title="new Date(tweet.created_at).toLocaleString()">{{ betweenTime(tweet.created_at) }}</span>
-            </div>
-            <div @click="ifTweetMenu = !ifTweetMenu" v-if="user_auth"
-                class="block w-max p-1 float-right hover:bg-[#0199ff1f] rounded-full group relative">
-                <DotsHorizontal class="fill-white stroke-[#71767b] group-hover:stroke-[#2563eb]" fillColor="none"
-                    :size="22" />
-                <div class="absolute right-1/4 top-full py-1 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
-                    style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifTweetMenu">
-                    <Link as="button" method="delete" :href="route('tweets.destroy', { id: tweet.id })" tabindex="0"
-                        v-if="tweet.user.name === user_auth.name && tweet.user.id === user_auth.id"
-                        class="px-2 py-2 text-white text-sm font-bold bg-black flex justify-start items-center gap-2 relative">
-                    <div class="p-2 px-1 inline-block">
-                        <TrashCanOutline fillColor="#f4212e" :size="21" />
-                    </div>
-                    Delete
+    <div class="w-full flex overflow-hidden border-b border-b-slate-500 p-2" ref="replyEle">
+        <!-- Image User Avatar -->
+        <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
+            ref="userImageTweeta">
+            <Link :href="route('profiling.show', { name: tweet.user.handle_name })">
+            <img :src="tweet.user.avatar"
+                class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[45px] min-h-[45px]"
+                :alt="tweet.name" />
+            </Link>
+        </div>
+        <!-- All Content of Post -->
+        <div class="w-[calc(100%-55px)] flex-1 h-full mx-1">
+            <!-- Title Top -->
+            <div class="flex flex-row justify-between items-center w-full">
+                <div class="flex justify-start items-center text-base truncate">
+                    <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
+                        class="text-white font-semibold inline-block hover:underline truncate" @mouseover="whenGoHover"
+                        @mouseleave="whenLeaveHover" ref="userNameTweeta">
+                    {{ tweet.user.name }}
                     </Link>
+                    <div class="Mark inline-block pl-2" v-if="tweet.user.blue_mark">
+                        <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
+                    </div>
+                    <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
+                        class="text-gray-400 font-light inline-block truncate pl-2" @mouseover="whenGoHover"
+                        @mouseleave="whenLeaveHover" ref="userTagNameTweeta">@{{ tweet.user.handle_name }}
+                    </Link>
+                    <span class="px-2 text-gray-400">.</span>
+                    <span class="text-gray-400 font-light hover:underline"
+                        :title="new Date(tweet.created_at).toLocaleString()">{{ betweenTime(tweet.created_at) }}</span>
+                </div>
+                <div @click="ifTweetMenu = !ifTweetMenu" v-if="user_auth"
+                    class="block w-max p-1 float-right hover:bg-[#0199ff1f] rounded-full group relative">
+                    <DotsHorizontal class="fill-white stroke-[#71767b] group-hover:stroke-[#2563eb]" fillColor="none"
+                        :size="22" />
+                    <div class="absolute right-1/4 top-full py-1 rounded-2xl overflow-hidden bg-black w-[305px] flex flex-col z-[5000]"
+                        style="box-shadow: 0 0 7px rgb(156 163 175 / 1);" v-show="ifTweetMenu">
+                        <Link as="button" method="delete" :href="route('tweets.destroy', { id: tweet.id })" tabindex="0"
+                            v-if="tweet.user.name === user_auth.name && tweet.user.id === user_auth.id"
+                            class="px-2 py-2 text-white text-sm font-bold bg-black flex justify-start items-center gap-2 relative">
+                        <div class="p-2 px-1 inline-block">
+                            <TrashCanOutline fillColor="#f4212e" :size="21" />
+                        </div>
+                        Delete
+                        </Link>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Comment post Div -->
-        <div class="text-white font-light text-sm mt-2 max-[320px]:text-xs">
-            <span class="break-words">{{ tweet.reply }}</span>
-        </div>
+            <!-- Comment post Div -->
+            <div class="text-white font-light text-sm mt-2 max-[320px]:text-xs">
+                <span class="break-words">{{ tweet.reply }}</span>
+            </div>
 
-        <!-- File Post Div -->
-        <div v-if="tweet.is_video === 'n'" class="relative h-[320px] w-full rounded-2xl mt-2 overflow-hidden">
-            <div class="relative h-full w-full flex justify-between items-center flex-row flex-wrap gap-4">
-                <div v-for="(img, i) in tweet.file.split('|')" :key="i" class="relative"
-                    :class="tweet.file.length >= 3 ? 'w-[150px] h-[150px]' : 'w-full h-full'"
-                    :style="tweet.file.length >= 3 ? 'flex: 1 1 45%' : 'flex: 1 1 0%'">
-                    <img @click="$emit('getimg', true, img)" class="w-full h-full object-cover rounded-2xl" :src="img"
-                        :alt="'image: ' + i + 1" />
+            <!-- File Post Div -->
+            <div v-if="tweet.is_video === 'n'" class="relative h-full w-full rounded-2xl mt-2 overflow-hidden">
+                <div class="relative h-full w-full flex justify-between items-center flex-row flex-wrap gap-4">
+                    <div v-for="(img, i) in tweet.file.split('|')" :key="i" class="relative"
+                        :class="tweet.file.length <= 3 ? 'w-[150px] h-[150px]' : 'w-full h-full'"
+                        :style="tweet.file.length <= 3 ? 'flex: 1 1 45%' : 'flex: 1 1 0%'">
+                        <img @click="$emit('getimg', true, img)" class="w-full h-full object-cover rounded-2xl" :src="img"
+                            :alt="'image: ' + i + 1" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div v-else-if="tweet.is_video === 'y'"
-            class="relative flex justify-center items-center w-full h-[500px] rounded-2xl mt-2" id="videoContainer">
-            <video @mouseover="hoverVideo = true" @mouseleave="hoverVideo = false"
-                class="max-w-full max-h-full rounded-2xl border border-gray-400" :src="tweet.file" autoplay
-                :controls="hoverVideo" :muted="!mutedPrevent" loop @canplay="updatePaused" @playing="updatePaused"
-                @pause="updatePaused">
-                <p>Sorry, there's a problem playing this video. Please try using a different browser.</p>
-            </video>
-            <button
-                class="rounded-full z-10 absolute flex justify-center items-center p-5 bg-[#1d9bf0] left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
-                v-show="pauseVideo" @click="play(), mutedPrevent = true">
-                <Play class="stroke-black" fillColor="#fff" size="50" />
-            </button>
-        </div>
+            <div v-else-if="tweet.is_video === 'y'"
+                class="relative flex justify-center items-center w-full h-[500px] rounded-2xl mt-2" id="videoContainer">
+                <video @mouseover="hoverVideo = true" @mouseleave="hoverVideo = false"
+                    class="max-w-full max-h-full rounded-2xl border border-gray-400" :src="tweet.file" autoplay
+                    :controls="hoverVideo" :muted="!mutedPrevent" loop @canplay="updatePaused" @playing="updatePaused"
+                    @pause="updatePaused">
+                    <p>Sorry, there's a problem playing this video. Please try using a different browser.</p>
+                </video>
+                <button
+                    class="rounded-full z-10 absolute flex justify-center items-center p-5 bg-[#1d9bf0] left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                    v-show="pauseVideo" @click="play(), mutedPrevent = true">
+                    <Play class="stroke-black" fillColor="#fff" size="50" />
+                </button>
+            </div>
 
-        <!-- Points Of Post Div -->
-        <!-- <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
+            <!-- Points Of Post Div -->
+            <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
+                <div class="cursor-pointer flex-1 flex justify-between items-center group"
+                    @click="$emit('getreply', tweet)">
+                    <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff4b]">
+                        <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
+                    </div>
+                    <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
+                        formatNumber(RepliesNum)
+                    }}</span>
+                </div>
+                <Link as="button" method="post" :href="route('replies.likes', { reply_id: tweet.id })" preserve-scroll
+                    @click="has_liked = !has_liked, has_liked ? likesNum += 1 : likesNum -= 1"
+                    class="flex-1 flex justify-between items-center group" :title="has_liked ? 'liked' : 'like'">
+                <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff01733d]">
+                    <Heart :fillColor="has_liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
+                        :size="16" />
+                </div>
+                <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{ formatNumber(likesNum)
+                }}</span>
+                </Link>
+                <div class="cursor-pointer flex-1 flex justify-between items-center group">
+                    <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
+                        <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
+                    </div>
+                    <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
+                        formatNumber(ViewedNum)
+                    }}</span>
+                </div>
+                <Link as="button" method="post" :href="route('replies.bookmarks', { reply_id: tweet.id })" preserve-scroll
+                    @click="has_booked = !has_booked, has_booked ? BookmarksNum += 1 : BookmarksNum -= 1"
+                    class="flex-1 flex justify-between items-center group"
+                    :title="has_booked ? 'marked' : 'add to bookmarks'">
+                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff3a]">
+                    <Bookmark :fillColor="has_booked ? '#3b82f6' : '#000'"
+                        class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(tweet.comments)
+                    formatNumber(BookmarksNum)
                 }}</span>
+                </Link>
             </div>
-            <Link as="button" method="post" :href="route('tweets.retweeting', { tweet_id: tweet.id })" preserve-scroll
-                @click="has_retweeted = !has_retweeted, has_retweeted ? RetweetsNum += 1 : RetweetsNum -= 1"
-                class="flex-1 flex justify-between items-center group" :title="has_retweeted ? 'retweeted' : 'retweet'">
-            <div class="rounded-full p-2 mr-1 group-hover:bg-[#01ff8062]">
-                <RecycleVariant :fillColor="has_retweeted ? '#4ade80' : '#000'"
-                    class="stroke-gray-500 group-hover:stroke-green-400" :size="16" />
-            </div>
-            <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-green-400">{{
-                formatNumber(RetweetsNum)
-            }}</span>
-            </Link>
-            <Link as="button" method="post" :href="route('tweets.likes', { tweet_id: tweet.id })" preserve-scroll
-                @click="has_liked = !has_liked, has_liked ? likesNum += 1 : likesNum -= 1"
-                class="flex-1 flex justify-between items-center group" :title="has_liked ? 'liked' : 'like'">
-            <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff017362]">
-                <Heart :fillColor="has_liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
-                    :size="16" />
-            </div>
-            <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{ formatNumber(likesNum)
-            }}</span>
-            </Link>
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
-                </div>
-                <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(tweet.analytics)
-                }}</span>
-            </div>
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <Share class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
-                </div>
-            </div>
-        </div> -->
+        </div>
     </div>
-    </Link>
 
     <!-- Hover User Section  -->
     <div ref="hoverSection" @mouseover="hoverSection.classList.add('showVisible')"
@@ -204,6 +200,7 @@ import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
 import ChartBar from "vue-material-design-icons/ChartBar.vue";
+import Bookmark from "vue-material-design-icons/Bookmark.vue";
 import Share from "vue-material-design-icons/Share.vue";
 import TrashCanOutline from "vue-material-design-icons/TrashCanOutline.vue";
 
@@ -214,25 +211,46 @@ const user_auth = usePage().props.auth.user;
 
 const ifTweetMenu = ref(false);
 
+const replyEle = ref(null);
 // -------------------------- Part ------------------------------------------
 // Points Of User Tweeta
-// const is_following = ref(false);
-// const has_liked = ref(false);
-// const has_retweeted = ref(false);
-// onMounted(() => {
-//     if (user_auth) {
-//         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
-//         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
-//         has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
-//     } else {
-//         is_following.value = false;
-//         has_liked.value = false;
-//         has_retweeted.value = false;
-//     }
-// })
-// // Live Numbers Of Points For The Tweeta
-// const likesNum = ref(tweet.value.likes.length);
-// const RetweetsNum = ref(tweet.value.retweets.length);
+const is_following = ref(false);
+const has_liked = ref(false);
+const has_booked = ref(false);
+const has_viewed = ref(false);
+onMounted(() => {
+    if (user_auth) {
+        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+        has_booked.value = tweet.value.bookmarks.some(userBooks => userBooks.id === user_auth.id);
+        has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
+    } else {
+        is_following.value = false;
+        has_liked.value = false;
+        has_booked.value = false;
+        has_viewed.value = false;
+    }
+})
+// Live Numbers Of Points For The Tweeta
+const likesNum = ref(tweet.value.likes.length);
+const RepliesNum = ref(tweet.value.replies.length);
+const BookmarksNum = ref(tweet.value.bookmarks.length);
+const ViewedNum = ref(tweet.value.viewed.length);
+// record the the movement of user when go inside post as viewed post
+watchEffect(() => {
+    if (parent_scroll.value) {
+        parent_scroll.value.addEventListener('scroll', (e) => {
+            if (replyEle.value) {
+                if (replyEle.value.getBoundingClientRect().y >= -320 && replyEle.value.getBoundingClientRect().y <= 460) {
+                    if (!has_viewed.value) {
+                        router.post(route('replies.viewed', { reply_id: tweet.value.id }), {}, { preserveScroll: true });
+                        ViewedNum.value += 1;
+                    }
+                }
+            }
+        })
+    }
+})
 
 // -------------------------- Part ------------------------------------------
 // Control Video

@@ -27,7 +27,7 @@ define('PAGINATION_COUNT', 10);
 // Note: {name} >> send handle name of user not the name of user.
 
 // -------------- User Tweets Pages & Store & Destroy ------------
-Route::get('/', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
+Route::get('/home', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
 // -------------- Tweet Show ------------
 Route::get('/{name}/status/{tweet_id}', [\App\Http\Controllers\TweetController::class, 'show'])->name('tweets.show');
 
@@ -56,8 +56,20 @@ Route::middleware('auth')->group(function () {
     Route::post('/tweets/{tweet_id}/retweeting', [\App\Http\Controllers\TweetController::class, 'toggleRetweets'])->name('tweets.retweeting');
     // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
     Route::post('/tweets/{tweet_id}/bookmarking', [\App\Http\Controllers\TweetController::class, 'toggleBookmarks'])->name('tweets.bookmarks');
+    // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
+    Route::post('/tweets/{tweet_id}/viewed', [\App\Http\Controllers\TweetController::class, 'toggleViewed'])->name('tweets.viewed');
+    // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
+    Route::post('/tweets/{tweet_id}/pinned', [\App\Http\Controllers\TweetController::class, 'togglePin'])->name('tweets.pinned');
     // -------------- add reply for tweet >> Reply class -------------
     Route::post('/tweets/{tweet_id}/addreply', [\App\Http\Controllers\ReplyController::class, 'store'])->name('replies.store');
+
+
+    // -------------- Likes ( attach , detach ) toggling method >> Reply class -------------
+    Route::post('/replies/{reply_id}/likes', [\App\Http\Controllers\ReplyController::class, 'toggleLikes'])->name('replies.likes');
+    // -------------- bookmarking ( attach , detach ) toggling method >> Reply class -------------
+    Route::post('/replies/{reply_id}/bookmarking', [\App\Http\Controllers\ReplyController::class, 'toggleBookmarks'])->name('replies.bookmarks');
+    // -------------- viewed ( attach , detach ) toggling method >> Reply class -------------
+    Route::post('/replies/{reply_id}/viewed', [\App\Http\Controllers\ReplyController::class, 'toggleViewed'])->name('replies.viewed');
 
 
     // -------------- Profile Default Pages ------------

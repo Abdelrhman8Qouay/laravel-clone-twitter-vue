@@ -11,7 +11,7 @@
         </Link>
     </div>
     <!-- All Content of Post -->
-    <div class="w-[calc(100%-55px)] flex-1 h-full mx-1">
+    <div class="w-[calc(100%-55px)] flex-1 h-full mx-1" ref="tweetEle">
         <!-- Title Top -->
         <div class="flex flex-row justify-between items-center w-full">
             <div class="flex justify-start items-center text-base truncate">
@@ -54,10 +54,10 @@
         </div>
 
         <!-- File Post Div -->
-        <div v-if="tweet.is_video === 'n'" class="relative h-[320px] w-full rounded-2xl mt-2 overflow-hidden">
+        <div v-if="tweet.is_video === 'n'" class="relative h-[390px] w-full rounded-2xl mt-2 overflow-hidden">
             <div class="relative h-full w-full flex justify-between items-center flex-row flex-wrap gap-4">
                 <div v-for="(img, i) in tweet.file.split('|')" :key="i" class="relative"
-                    :class="tweet.file.length >= 3 ? 'w-[150px] h-[150px]' : 'w-full h-full'"
+                    :class="tweet.file.length <= 3 ? 'w-[150px] h-[150px]' : 'w-full h-full'"
                     :style="tweet.file.length >= 3 ? 'flex: 1 1 45%' : 'flex: 1 1 0%'">
                     <img @click="$emit('getimg', true, img)" class="w-full h-full object-cover rounded-2xl" :src="img"
                         :alt="'image: ' + i + 1" />
@@ -83,10 +83,10 @@
         <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
             <div class="cursor-pointer flex-1 flex justify-between items-center group">
                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
+                    <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(tweet.comments)
+                    formatNumber(tweet.replies_count)
                 }}</span>
             </div>
             <Link as="button" method="post" :href="route('tweets.retweeting', { tweet_id: tweet.id })" preserve-scroll
@@ -112,10 +112,10 @@
             </Link>
             <div class="cursor-pointer flex-1 flex justify-between items-center group">
                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
+                    <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(tweet.analytics)
+                    formatNumber(ViewedNum)
                 }}</span>
             </div>
             <div class="cursor-pointer flex-1 flex justify-between items-center group">
@@ -185,9 +185,9 @@ import { ref, defineProps, toRefs, watchEffect, computed, onMounted } from "vue"
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
+// -------------- Icons
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
 import DotsHorizontal from "vue-material-design-icons/DotsHorizontal.vue";
-
 import EmoticonSadOutline from "vue-material-design-icons/EmoticonSadOutline.vue";
 import AccountRemove from "vue-material-design-icons/AccountRemove.vue";
 import AccountPlus from "vue-material-design-icons/AccountPlus.vue";
@@ -197,9 +197,7 @@ import BlockHelper from "vue-material-design-icons/BlockHelper.vue";
 import CodeLessThan from "vue-material-design-icons/CodeLessThan.vue";
 import AlertOctagonOutline from "vue-material-design-icons/AlertOctagonOutline.vue";
 import ChatRemoveOutline from "vue-material-design-icons/ChatRemoveOutline.vue";
-
 import Play from "vue-material-design-icons/Play.vue";
-
 import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
@@ -220,20 +218,40 @@ const ifTweetMenu = ref(false);
 const is_following = ref(false);
 const has_liked = ref(false);
 const has_retweeted = ref(false);
+const has_viewed = ref(false);
 onMounted(() => {
     if (user_auth) {
         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
         has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
+        has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
     } else {
         is_following.value = false;
         has_liked.value = false;
         has_retweeted.value = false;
+        has_viewed.value = false;
     }
 })
 // Live Numbers Of Points For The Tweeta
 const likesNum = ref(tweet.value.likes.length);
 const RetweetsNum = ref(tweet.value.retweets.length);
+const ViewedNum = ref(tweet.value.viewed.length);
+// record the the movement of user when go inside post as viewed post
+const tweetEle = ref(null);
+watchEffect(() => {
+    if (parent_scroll.value) {
+        parent_scroll.value.addEventListener('scroll', (e) => {
+            if (tweetEle.value) {
+                if (tweetEle.value.getBoundingClientRect().y >= -320 && tweetEle.value.getBoundingClientRect().y <= 460) {
+                    if (!has_viewed.value) {
+                        router.post(route('tweets.viewed', { tweet_id: tweet.value.id }), {}, { preserveScroll: true });
+                        ViewedNum.value += 1;
+                    }
+                }
+            }
+        })
+    }
+})
 
 // -------------------------- Part ------------------------------------------
 // Control Video

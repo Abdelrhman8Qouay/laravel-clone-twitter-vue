@@ -57,7 +57,6 @@ onMounted(() => {
             loading.value = true;
             loading.value = props.loadMore();
         }
-        // console.log(list_scrolling.value.scrollHeight, list_scrolling.value.clientHeight);
     }, 1000);
 })
 

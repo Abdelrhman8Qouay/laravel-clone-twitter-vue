@@ -17,6 +17,12 @@ class Tweet extends Model
         return $this->belongsTo( User::class, 'user_id', 'id' );
     }
 
+
+
+    public function viewed() {
+        return $this->belongsToMany( User::class, 'tweets_viewed' )->withTimestamps();
+    }
+
     public function likes() {
         return $this->belongsToMany( User::class, 'tweets_likes' )->withTimestamps();
     }
@@ -29,7 +35,15 @@ class Tweet extends Model
         return $this->belongsToMany( User::class, 'tweets_bookmarks')->withTimestamps();
     }
 
+    public function pin() {
+        return $this->belongsToMany( User::class, 'tweets_pinned')->withTimestamps();
+    }
+
+
+
+
     public function replies() {
         return $this->hasMany( Reply::class, 'tweet_id', 'id' );
     }
+
 }
