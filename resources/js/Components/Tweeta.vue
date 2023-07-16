@@ -1,5 +1,5 @@
 <template>
-    <Link :href="route('tweets.show', { name: tweet.user.handle_name, tweet_id: tweet.id })"
+    <Link as="div" :href="route('tweets.show', { name: tweet.user.handle_name, tweet_id: tweet.id })"
         class="w-full flex overflow-hidden border-b border-b-slate-500 cursor-pointer p-2">
     <!-- Image User Avatar -->
     <div @mouseover="whenGoHover" @mouseleave="whenLeaveHover" class="w-[51px] max-h-[51px] pr-3 inline-block relative"
@@ -81,47 +81,42 @@
 
         <!-- Points Of Post Div -->
         <div class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-2 overflow-hidden">
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
+            <div class="cursor-pointer flex-1 flex justify-between items-center group"
+                @click="$emit('clickSendData', tweet)">
+                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff39]">
+                    <Message class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
                     formatNumber(tweet.replies_count)
                 }}</span>
             </div>
             <Link as="button" method="post" :href="route('tweets.retweeting', { tweet_id: tweet.id })" preserve-scroll
-                @click="has_retweeted = !has_retweeted, has_retweeted ? RetweetsNum += 1 : RetweetsNum -= 1"
-                class="flex-1 flex justify-between items-center group" :title="has_retweeted ? 'retweeted' : 'retweet'">
-            <div class="rounded-full p-2 mr-1 group-hover:bg-[#01ff8062]">
-                <RecycleVariant :fillColor="has_retweeted ? '#4ade80' : '#000'"
+                class="flex-1 flex justify-between items-center group" :title="tweet.retweeted ? 'retweeted' : 'retweet'">
+            <div class="rounded-full p-2 mr-1 group-hover:bg-[#01ff8031]">
+                <RecycleVariant :fillColor="tweet.retweeted ? '#4ade80' : '#000'"
                     class="stroke-gray-500 group-hover:stroke-green-400" :size="16" />
             </div>
             <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-green-400">{{
-                formatNumber(RetweetsNum)
+                formatNumber(tweet.retweets_count)
             }}</span>
             </Link>
             <Link as="button" method="post" :href="route('tweets.likes', { tweet_id: tweet.id })" preserve-scroll
-                @click="has_liked = !has_liked, has_liked ? likesNum += 1 : likesNum -= 1"
-                class="flex-1 flex justify-between items-center group" :title="has_liked ? 'liked' : 'like'">
-            <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff017362]">
-                <Heart :fillColor="has_liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
+                class="flex-1 flex justify-between items-center group" :title="tweet.liked ? 'liked' : 'like'">
+            <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff017337]">
+                <Heart :fillColor="tweet.liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
                     :size="16" />
             </div>
-            <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{ formatNumber(likesNum)
+            <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{
+                formatNumber(tweet.likes_count)
             }}</span>
             </Link>
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
+            <div class="cursor-pointer flex-1 flex justify-between items-center group" title="analytics views">
+                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff41]">
                     <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(ViewedNum)
+                    formatNumber(tweet.viewed_count)
                 }}</span>
-            </div>
-            <div class="cursor-pointer flex-1 flex justify-between items-center group">
-                <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                    <Share class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
-                </div>
             </div>
         </div>
     </div>
@@ -181,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, toRefs, watchEffect, computed, onMounted } from "vue";
+import { ref, defineProps, toRefs, watchEffect, computed, watch } from "vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
@@ -198,7 +193,7 @@ import CodeLessThan from "vue-material-design-icons/CodeLessThan.vue";
 import AlertOctagonOutline from "vue-material-design-icons/AlertOctagonOutline.vue";
 import ChatRemoveOutline from "vue-material-design-icons/ChatRemoveOutline.vue";
 import Play from "vue-material-design-icons/Play.vue";
-import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
+import Message from "vue-material-design-icons/Message.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
 import ChartBar from "vue-material-design-icons/ChartBar.vue";
@@ -211,31 +206,35 @@ const { tweet, parent_scroll } = toRefs(props);
 const user_auth = usePage().props.auth.user;
 
 
+// watch(tweet, (newTweet) => {
+//     tweet.value = newTweet;
+// })
+
 const ifTweetMenu = ref(false);
 
 // -------------------------- Part ------------------------------------------
 // Points Of User Tweeta
-const is_following = ref(false);
-const has_liked = ref(false);
-const has_retweeted = ref(false);
-const has_viewed = ref(false);
-onMounted(() => {
-    if (user_auth) {
-        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
-        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
-        has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
-        has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
-    } else {
-        is_following.value = false;
-        has_liked.value = false;
-        has_retweeted.value = false;
-        has_viewed.value = false;
-    }
-})
-// Live Numbers Of Points For The Tweeta
-const likesNum = ref(tweet.value.likes.length);
-const RetweetsNum = ref(tweet.value.retweets.length);
-const ViewedNum = ref(tweet.value.viewed.length);
+// const is_following = ref(false);
+// const has_liked = ref(false);
+// const has_retweeted = ref(false);
+// const has_viewed = ref(false);
+// onMounted(() => {
+//     if (user_auth) {
+//         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+//         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+//         has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
+//         has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
+//     } else {
+//         is_following.value = false;
+//         has_liked.value = false;
+//         has_retweeted.value = false;
+//         has_viewed.value = false;
+//     }
+// })
+// // Live Numbers Of Points For The Tweeta
+// const likesNum = ref(tweet.value.likes.length);
+// const RetweetsNum = ref(tweet.value.retweets.length);
+// const ViewedNum = ref(tweet.value.viewed.length);
 // record the the movement of user when go inside post as viewed post
 const tweetEle = ref(null);
 watchEffect(() => {
@@ -243,9 +242,9 @@ watchEffect(() => {
         parent_scroll.value.addEventListener('scroll', (e) => {
             if (tweetEle.value) {
                 if (tweetEle.value.getBoundingClientRect().y >= -320 && tweetEle.value.getBoundingClientRect().y <= 460) {
-                    if (!has_viewed.value) {
-                        router.post(route('tweets.viewed', { tweet_id: tweet.value.id }), {}, { preserveScroll: true });
-                        ViewedNum.value += 1;
+                    if (!tweet.value.vieweded) {
+                        router.post(route('tweets.viewed', { tweet_id: tweet.value.id }), {}, { preserveScroll: true, preserveState: true });
+                        // console.log('what', has_viewed.value);
                     }
                 }
             }

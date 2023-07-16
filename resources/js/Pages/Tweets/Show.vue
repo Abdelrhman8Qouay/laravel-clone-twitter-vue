@@ -43,7 +43,7 @@
                                     </Link>
                                 </div>
 
-                                <div class="flex flex-col text-base truncate">
+                                <div class="flex flex-col text-base truncate justify-between">
                                     <div class="flex justify-start items-center text-base truncate">
                                         <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
                                             class="text-white font-semibold inline-block hover:underline truncate"
@@ -88,7 +88,7 @@
 
                             <!-- File Post Div -->
                             <div v-if="tweet.is_video === 'n'"
-                                class="relative h-[320px] w-full rounded-2xl mt-2 overflow-hidden">
+                                class="relative h-[430px] w-full rounded-2xl mt-2 overflow-hidden">
                                 <div
                                     class="relative h-full w-full flex justify-between items-center flex-row flex-wrap gap-4 cursor-pointer">
                                     <div v-for="(img, i) in tweet.file.split('|')" :key="i" class="relative"
@@ -132,15 +132,17 @@
                             <div class="text-gray-400 mt-4 overflow-hidden">
                                 <Link href="/"
                                     class="text-gray-400 text-sm font-extralight cursor-pointer mr-3 inline-flex gap-1 items-center">
-                                <span class="font-bold mx-1 text-white">{{ formatNumber(RetweetsNum) }}</span>Retweets
+                                <span class="font-bold mx-1 text-white">{{ formatNumber(tweet.retweets_count)
+                                }}</span>Retweets
                                 </Link>
                                 <Link href="/"
                                     class="text-gray-400 text-sm font-extralight cursor-pointer mr-3 inline-flex gap-1 items-center">
-                                <span class="font-bold mx-1 text-white">{{ formatNumber(likesNum) }}</span>Likes
+                                <span class="font-bold mx-1 text-white">{{ formatNumber(tweet.likes_count) }}</span>Likes
                                 </Link>
                                 <Link href="/"
                                     class="text-gray-400 text-sm font-extralight cursor-pointer mr-3 inline-flex gap-1 items-center">
-                                <span class="font-bold mx-1 text-white">{{ formatNumber(bookedNum) }}</span>Bookmarks
+                                <span class="font-bold mx-1 text-white">{{ formatNumber(tweet.bookmarks_count)
+                                }}</span>Bookmarks
                                 </Link>
                             </div>
 
@@ -152,8 +154,8 @@
                                 class="flex flex-row justify-start items-center gap-2 text-[#1d9bf0] mt-4 overflow-hidden">
                                 <div class="cursor-pointer flex-1 flex justify-between items-center group"
                                     @click="newReplyShow = true, dataNewReply = tweet">
-                                    <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                                        <MessageOutline fillColor="#000" class="stroke-gray-500 group-hover:stroke-blue-500"
+                                    <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff41]">
+                                        <Message fillColor="#000" class="stroke-gray-500 group-hover:stroke-blue-500"
                                             :size="20" />
                                     </div>
                                     <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
@@ -162,40 +164,34 @@
                                 </div>
                                 <Link as="button" method="post" :href="route('tweets.retweeting', { tweet_id: tweet.id })"
                                     preserve-scroll
-                                    @click="has_retweeted = !has_retweeted, has_retweeted ? RetweetsNum += 1 : RetweetsNum -= 1"
+                                    @click="tweet.retweeted = !tweet.retweeted, tweet.retweeted ? RetweetsNum += 1 : RetweetsNum -= 1"
                                     class="flex-1 flex justify-between items-center group"
-                                    :title="has_retweeted ? 'retweeted' : 'retweet'">
+                                    :title="tweet.retweeted ? 'retweeted' : 'retweet'">
                                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#00ba7c1a]">
-                                    <RecycleVariant :fillColor="has_retweeted ? '#4ade80' : '#000'"
+                                    <RecycleVariant :fillColor="tweet.retweeted ? '#4ade80' : '#000'"
                                         class="stroke-gray-500 group-hover:stroke-green-400" :size="20" />
                                 </div>
                                 </Link>
                                 <Link as="button" method="post" :href="route('tweets.likes', { tweet_id: tweet.id })"
                                     preserve-scroll
-                                    @click="has_liked = !has_liked, has_liked ? likesNum += 1 : likesNum -= 1"
+                                    @click="tweet.liked = !tweet.liked, tweet.liked ? likesNum += 1 : likesNum -= 1"
                                     class="flex-1 flex justify-between items-center group"
-                                    :title="has_liked ? 'liked' : 'like'">
+                                    :title="tweet.liked ? 'liked' : 'like'">
                                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#f918801a]">
-                                    <Heart :fillColor="has_liked ? '#e11d48' : '#000'"
+                                    <Heart :fillColor="tweet.liked ? '#e11d48' : '#000'"
                                         class="stroke-gray-500 group-hover:stroke-rose-600" :size="20" />
                                 </div>
                                 </Link>
                                 <Link as="button" method="post" :href="route('tweets.bookmarks', { tweet_id: tweet.id })"
                                     preserve-scroll
-                                    @click="has_booked = !has_booked, has_booked ? bookedNum += 1 : bookedNum -= 1"
+                                    @click="tweet.marked = !tweet.marked, tweet.marked ? bookedNum += 1 : bookedNum -= 1"
                                     class="flex-1 flex justify-between items-center group"
-                                    :title="has_booked ? 'remove tweet from bookmarks' : 'bookmark'">
+                                    :title="tweet.marked ? 'remove tweet from bookmarks' : 'bookmark'">
                                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff31]">
-                                    <Bookmark :fillColor="has_booked ? '#3b82f6' : '#000'"
+                                    <Bookmark :fillColor="tweet.marked ? '#3b82f6' : '#000'"
                                         class="stroke-gray-500 group-hover:stroke-blue-500" :size="20" />
                                 </div>
                                 </Link>
-                                <div class=" cursor-pointer flex-1 flex justify-between items-center group">
-                                    <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff62]">
-                                        <Share class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000"
-                                            :size="20" />
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Twitter Divider -->
@@ -286,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watchEffect, toRefs, defineProps, computed } from "vue";
+import { ref, watch, watchEffect, toRefs, defineProps, computed } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 
@@ -309,7 +305,7 @@ const props = defineProps({ tweet: Array, replies: Object, user_following_count:
 const { tweet, replies, user_following_count, user_followers_count } = toRefs(props);
 const user_auth = usePage().props.auth.user;
 
-//------------------------------------------------ static vars
+//------------------------------------------------ dynamic vars
 const loaderFloatShow = ref(false);
 const newReplyShow = ref(false);
 const dataNewReply = ref(tweet.value);
@@ -339,14 +335,16 @@ const loadMoreFunc = () => {
     return false;
 }
 
-
+watch(replies, (newRepliesPosted) => {
+    repliesTweetPosted.value = newRepliesPosted.data;
+})
 
 // --------------------------------------------------------------------- Main Tweet Options
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
 // Icons for the Main tweet
 import Play from "vue-material-design-icons/Play.vue";
-import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
+import Message from "vue-material-design-icons/Message.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
 import Bookmark from "vue-material-design-icons/Bookmark.vue";
@@ -357,27 +355,27 @@ const ifTweetMenu = ref(false);
 
 // -------------------------- Part ------------------------------------------
 // Points Of User Tweeta
-const is_following = ref(false);
-const has_liked = ref(false);
-const has_retweeted = ref(false);
-const has_booked = ref(false);
-onMounted(() => {
-    if (user_auth) {
-        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
-        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
-        has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
-        has_booked.value = tweet.value.bookmarks.some(userRet => userRet.id === user_auth.id);
-    } else {
-        is_following.value = false;
-        has_liked.value = false;
-        has_retweeted.value = false;
-        has_booked.value = false;
-    }
-})
-// Live Numbers Of Points For The Tweeta
-const likesNum = ref(tweet.value.likes.length);
-const RetweetsNum = ref(tweet.value.retweets.length);
-const bookedNum = ref(tweet.value.bookmarks.length);
+// const is_following = ref(false);
+// const has_liked = ref(false);
+// const has_retweeted = ref(false);
+// const has_booked = ref(false);
+// onMounted(() => {
+//     if (user_auth) {
+//         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+//         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+//         has_retweeted.value = tweet.value.retweets.some(userRet => userRet.id === user_auth.id);
+//         has_booked.value = tweet.value.bookmarks.some(userRet => userRet.id === user_auth.id);
+//     } else {
+//         is_following.value = false;
+//         has_liked.value = false;
+//         has_retweeted.value = false;
+//         has_booked.value = false;
+//     }
+// })
+// // Live Numbers Of Points For The Tweeta
+// const likesNum = ref(tweet.value.likes.length);
+// const RetweetsNum = ref(tweet.value.retweets.length);
+// const bookedNum = ref(tweet.value.bookmarks.length);
 
 // -------------------------- Part ------------------------------------------
 // Control Video

@@ -60,10 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/tweets/{tweet_id}/viewed', [\App\Http\Controllers\TweetController::class, 'toggleViewed'])->name('tweets.viewed');
     // -------------- bookmarking ( attach , detach ) toggling method >> Tweet class -------------
     Route::post('/tweets/{tweet_id}/pinned', [\App\Http\Controllers\TweetController::class, 'togglePin'])->name('tweets.pinned');
+
+
     // -------------- add reply for tweet >> Reply class -------------
     Route::post('/tweets/{tweet_id}/addreply', [\App\Http\Controllers\ReplyController::class, 'store'])->name('replies.store');
-
-
     // -------------- Likes ( attach , detach ) toggling method >> Reply class -------------
     Route::post('/replies/{reply_id}/likes', [\App\Http\Controllers\ReplyController::class, 'toggleLikes'])->name('replies.likes');
     // -------------- bookmarking ( attach , detach ) toggling method >> Reply class -------------

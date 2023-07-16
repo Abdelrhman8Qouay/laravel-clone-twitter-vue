@@ -2,19 +2,19 @@
     <!-- Tweet Overlay Modal -->
     <!-- Overlay -->
     <div @click.self="
-        showImageUploaded.length || showVideoUploaded || tweeting ? (openDiscardTweet = true) : $emit('clickClose', false)
+        showImageUploaded.length || showVideoUploaded || data.tweet ? (openDiscardTweet = true) : $emit('clickClose', false)
         " v-if="is_overlay" class="fixed left-0 top-0 w-screen h-screen bg-[#5b708366] z-[15000]">
         <div
             class="fixed rounded-xl max-md:rounded-none overflow-auto pt-3 px-3 min-w-[650px] max-md:min-w-[100vw] max-md:w-[100vw] md:max-h-[88vh] max-md:h-[100vh] left-1/2 -translate-x-1/2 max-md:translate-x-0 max-md:left-0 top-14 max-md:top-0 bg-black">
             <!-- Close Buttons Div -->
             <div class="flex flex-row items-center justify-between w-full text-start mb-4">
                 <Close @click="
-                    showImageUploaded.length || showVideoUploaded || tweeting
+                    showImageUploaded.length || showVideoUploaded || data.tweet
                         ? (openDiscardTweet = true)
                         : $emit('clickClose', false)
                     " class="block max-md:hidden cursor-pointer" fillColor="#fff" :size="25" />
                 <ArrowLeft @click="
-                    showImageUploaded.length || showVideoUploaded || tweeting
+                    showImageUploaded.length || showVideoUploaded || data.tweet
                         ? (openDiscardTweet = true)
                         : $emit('clickClose', false)
                     " class="hidden max-md:block cursor-pointer" fillColor="#fff" :size="25" />
@@ -163,7 +163,7 @@
                         </div>
                         <div class="flex flex-row justify-between items-center h-full p-1">
                             <!-- progress circle -->
-                            <div v-show="showLimit"
+                            <div v-if="data.tweet" v-show="showLimit"
                                 :class="writeLimit >= 260 ? 'w-8 h-8 before:w-7 before:h-7' : 'h-5 w-5 before:w-4 before:h-4'"
                                 class="flex justify-center items-center relative rounded-full bg-slate-600 p-1 before:absolute before:rounded-full before:bg-black"
                                 :style="`background: conic-gradient(${stopLimitColor} ${writeLimit * 1.285}deg,#64748b 0deg);`">
@@ -177,7 +177,7 @@
                             <div class="w-[1px] h-4 mx-3 bg-slate-500"></div>
 
                             <!-- tweeting for tweet Button -->
-                            <button @click="storeTweet()"
+                            <button @click="storeTweet(), $emit('clickClose', false)"
                                 :disabled="!data.tweet && !showImageUploaded.length && !showVideoUploaded ? true : false || writeLimit >= 280"
                                 class="flex justify-center items-center bg-[#1d9bf0] hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 rounded-2xl transition transition-200 text-white font-semibold w-max py-1 px-3">
                                 <span>Tweet</span>
@@ -534,7 +534,7 @@ const storeTweet = () => {
     }
 
     // send data with inertia.js on laravel
-    data.post('/tweets');
+    data.post('/tweets', { preserveState: true, preserveScroll: true });
 
     reTweeting();
 }

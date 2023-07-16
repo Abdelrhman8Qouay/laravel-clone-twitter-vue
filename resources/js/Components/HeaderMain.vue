@@ -8,7 +8,7 @@
             <slot name="more"></slot>
         </div>
         <div class="flex border-b border-b-slate-500">
-            <slot>Call Links Here</slot>
+            <slot></slot>
         </div>
     </div>
 </template>

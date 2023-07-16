@@ -1,25 +1,70 @@
 
 <template>
     <!-- Tweet Reply Overlay  -->
-    <div v-if="is_overlay" @click.self="$emit('clickself', false)"
-        class="fixed left-0 top-0 w-screen h-screen bg-[#5b708366] z-[20000]">
-        <div @click.self="$emit('clickself', false)"
-            class="w-[650px] max-md:w-[100vw] h-max max-md:h-[100vh] p-5 text-white fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 max-md:top-0 max-md:-translate-x-0 max-md:-translate-y-0 max-md:left-0 bg-black rounded-xl max-md:rounded-none overflow-auto">
+    <div v-if="is_overlay" @click.self="
+        showImageUploaded.length || showVideoUploaded || data.tweet ? (openDiscardTweet = true) : $emit('clickself', false)
+        " class="fixed left-0 top-0 w-screen h-screen bg-[#5b708366] z-[15000]">
+        <div @click.self="
+            showImageUploaded.length || showVideoUploaded || data.tweet ? (openDiscardTweet = true) : $emit('clickself', false)
+            "
+            class="fixed rounded-xl max-md:rounded-none overflow-auto pt-3 px-3 min-w-[650px] max-md:min-w-[100vw] max-md:w-[100vw] md:max-h-[88vh] max-md:h-[100vh] left-1/2 -translate-x-1/2 max-md:translate-x-0 max-md:left-0 top-14 max-md:top-0 bg-black">
             <!-- Top Content  -->
             <div class="bg-black bg-opacity-50 backdrop-blur-md sticky left-0 top-0 w-full z-10">
                 <div class="flex">
                     <div class="flex flex-row items-center justify-between w-full text-start mb-4">
                         <div class="flex justify-center items-center">
-                            <Close @click="$emit('clickself', false)" class="inline-block cursor-pointer" fillColor="#fff"
-                                :size="25" />
+                            <Close @click="
+                                showImageUploaded.length || showVideoUploaded || data.tweet ? (openDiscardTweet = true) : $emit('clickself', false)
+                                " class="inline-block cursor-pointer" fillColor="#fff" :size="25" />
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Show User Replying Info -->
-            <div class="ml-[51px] truncate text-gray-400 font-light text-sm">Replying To <span class="text-[#1d9bf0]"
-                    @click="repOverlay = true">@{{
-                        tweet.user.handle_name }}</span></div>
+            <div class="flex w-full min-h-[100px] gap-3">
+                <!-- left Section User -->
+                <div class="w-[51px] flex flex-col justify-center items-center">
+                    <!-- Image User Avatar -->
+                    <div class="w-[40px] h-[40px] inline-block relative">
+                        <Link :href="route('profiling.show', { name: tweet.user.handle_name })">
+                        <img :src="tweet.user.avatar"
+                            class="rounded-full inline-block hover:opacity-50 transition-opacity duration-300 min-w-[40px] min-h-[40px]"
+                            :alt="tweet.name" />
+                        </Link>
+                    </div>
+                    <!-- thread to user -->
+                    <div class="bg-[#333639] w-[2px] mt-2 h-full border-l border-l-[#333639]"></div>
+                </div>
+                <!-- Right Section User -->
+                <div class="flex-1">
+                    <!-- Title Top -->
+                    <div class="flex flex-row gap-2 items-center w-full mb-4 ">
+                        <div class="flex justify-start items-center text-base truncate">
+                            <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
+                                class="text-white font-semibold inline-block hover:underline truncate" ref="userNameTweeta">
+                            {{ tweet.user.name }}
+                            </Link>
+                            <div class="Mark inline-block pl-2" v-if="tweet.user.blue_mark">
+                                <CheckDecagram class="inline-block" fillColor="#2563eb" :size="18" />
+                            </div>
+                            <Link :href="route('profiling.show', { name: tweet.user.handle_name })"
+                                class="text-gray-400 font-light inline-block truncate pl-2">@{{ tweet.user.handle_name }}
+                            </Link>
+                            <span class="px-2 text-gray-400">.</span>
+                            <span class="text-gray-400 font-light hover:underline"
+                                :title="new Date(tweet.created_at).toLocaleString()">{{ betweenTime(tweet.created_at)
+                                }}</span>
+                        </div>
+                    </div>
+                    <!-- Post Tweet Div -->
+                    <div class="text-white font-light text-sm mb-2 max-[320px]:text-xs">
+                        <span class="break-words">{{ tweet.tweet }}</span>
+                    </div>
+                    <div class="truncate text-gray-400 font-light text-sm">Replying To <span class="text-[#1d9bf0]"
+                            @click="repOverlay = true">@{{
+                                tweet.user.handle_name }}</span></div>
+                </div>
+            </div>
             <div class="w-full flex p-2">
                 <!-- Image User Avatar -->
                 <div class="w-[51px] max-h-[51px] mr-3 relative group">
@@ -88,7 +133,8 @@
                         </div>
                         <div class="flex flex-row justify-between items-center h-full p-1">
                             <!-- progress circle -->
-                            <div :class="writeLimit >= 260 ? 'w-8 h-8 before:w-7 before:h-7' : 'h-5 w-5 before:w-4 before:h-4'"
+                            <div v-if="data.tweet"
+                                :class="writeLimit >= 260 ? 'w-8 h-8 before:w-7 before:h-7' : 'h-5 w-5 before:w-4 before:h-4'"
                                 class="flex justify-center items-center relative rounded-full bg-slate-600 p-1 mx-3 before:absolute before:rounded-full before:bg-black"
                                 :style="`background: conic-gradient(${stopLimitColor} ${writeLimit * 1.285}deg,#64748b 0deg);`">
                                 <div :style="`color: ${stopLimitColor}`" class="relative text-xs truncate">{{ writeLimit >=
@@ -99,7 +145,7 @@
                             </div>
 
                             <!-- tweeting for tweet Button -->
-                            <button @click="storeTweet()"
+                            <button @click="storeTweet(), $emit('clickself', false)"
                                 :disabled="!data.tweet && !showImageUploaded.length && !showVideoUploaded ? true : false || writeLimit >= 280"
                                 class="flex justify-center items-center bg-[#1d9bf0] hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 rounded-2xl transition transition-200 text-white font-semibold w-max py-1 px-3">
                                 <span>Reply</span>
@@ -249,12 +295,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Wanna Close Tweet Modal -->
+    <div v-if="openDiscardTweet && is_overlay" class="fixed left-0 top-0 w-screen h-screen bg-[#5b708366] z-[20000]">
+        <div
+            class="rounded-xl w-[280px] h-max p-5 text-white fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-black">
+            <h3 class="text-white font-bold text-lg mb-2">Close Tweet?</h3>
+            <div class="text-gray-400 text-base font-light mb-3">
+                Are you sure that you want to close changes of new tweet?
+            </div>
+            <button @click="$emit('clickself', false), openDiscardTweet = false"
+                class="flex items-center justify-center rounded-full mb-2 py-2 px-3 w-full bg-slate-100 hover:bg-slate-200 transition duration-300 font-normal text-black">
+                Yes
+            </button>
+            <button @click="openDiscardTweet = false"
+                class="flex items-center justify-center rounded-full py-2 px-3 w-full border border-white bg-black hover:bg-slate-950 transition duration-300 font-normal text-white">
+                No
+            </button>
+        </div>
+    </div>
 </template>
 
 
 <script setup>
 import { ref, computed, toRefs, defineProps } from "vue";
 import { usePage, useForm, Link } from "@inertiajs/vue3";
+import { formatNumber, betweenTime } from '@/Modules/utilities';
 
 const props = defineProps({ tweet: Array, is_overlay: Boolean })
 const { tweet, is_overlay } = toRefs(props);
@@ -275,6 +341,8 @@ import EmoticonHappyOutline from "vue-material-design-icons/EmoticonHappyOutline
 
 // ----------------------------------------------------------- Information Replying User
 const repOverlay = ref(false);
+// ------------------------------ Tweet Overlay
+const openDiscardTweet = ref(false);
 
 // ----------------------------------------------------------- Replying Operators
 const activeHover = ref(false);
@@ -407,7 +475,7 @@ const storeTweet = () => {
     }
 
     // send data with inertia.js on laravel
-    data.post(route('replies.store', { tweet_id: tweet.value.id }));
+    data.post(route('replies.store', { tweet_id: tweet.value.id }), { preserveState: true, preserveScroll: true });
 
     reTweeting();
 }

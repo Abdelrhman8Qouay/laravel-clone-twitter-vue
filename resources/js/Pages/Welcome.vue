@@ -14,7 +14,8 @@
                     <NewTweet v-if="user_auth" :is_overlay="false" />
                     <!-- All Posts -->
                     <Tweeta v-for="(post, i) in tweetsPosted" :key="i" :tweet="post" :parent_scroll="parent_scroll"
-                        @getimg="(bol, imgData) => { openImgFullScreen = bol; imgPostFullSData = imgData }" />
+                        @getimg="(bol, imgData) => { openImgFullScreen = bol; imgPostFullSData = imgData }"
+                        @clickSendData="(postData) => { dataNewReply = postData; newReplyShow = true }" />
                 </InfiniteScrolling>
             </template>
         </LayoutTwitter>
@@ -25,19 +26,25 @@
 
     <!-- Show Image Post Full Screen -->
     <ShowImgFullScreen v-if="openImgFullScreen" @clickself="(bol) => openImgFullScreen = bol" :imgData="imgPostFullSData" />
+
+    <!-- Replay Overlay -->
+    <NewReply :tweet="dataNewReply" :is_overlay="true" @clickself="(bol) => newReplyShow = bol"
+        v-if="newReplyShow && !dataNewReply" />
 </template>
 
 <script setup>
-import { ref, onMounted, watchEffect, toRefs, defineProps } from "vue";
+import { ref, onMounted, watch, toRefs, defineProps } from "vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 
+// ---------------- Components
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
 import HeaderMain from "@/Components/HeaderMain.vue";
 import ShowImgFullScreen from "@/Components/ShowImgFullScreen.vue";
 import InfiniteScrolling from "@/Components/InfiniteScrolling.vue";
 import NewTweet from "@/Components/NewTweet.vue";
 import Tweeta from "@/Components/Tweeta.vue";
+import NewReply from "@/Components/NewReply.vue";
 import LoaderFloating from "@/Components/LoaderFloating.vue";
 
 import LinkHeaderLayout from "@/Components/LinkHeaderLayout.vue";
@@ -46,16 +53,19 @@ const props = defineProps({ tweets: Array })
 const { tweets } = toRefs(props);
 const user_auth = usePage().props.auth.user;
 
-// console.log($routes);
-
+//------------------------------------------------ dynamic vars
+// newReply
+const newReplyShow = ref(false);
+const dataNewReply = ref(null);
+// Show Image Post Full Screen
+const openImgFullScreen = ref(false);
+const imgPostFullSData = ref('');
+// loader float
 const loaderFloatShow = ref(false);
 
 const parent_scroll = ref(null);
 
 
-// Show Image Post Full Screen
-const openImgFullScreen = ref(false);
-const imgPostFullSData = ref('');
 
 
 // Get Posts And Create
@@ -77,6 +87,11 @@ const loadMoreFunc = () => {
 
     return false;
 }
+
+
+watch(tweets, (newTweetsPosted) => {
+    tweetsPosted.value = newTweetsPosted.data;
+})
 
 </script>
 

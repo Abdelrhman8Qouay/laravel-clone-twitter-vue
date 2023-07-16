@@ -46,7 +46,7 @@
                     <div class="bg-gray-600 w-full h-[1px]"></div>
                     <Link as="button" class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] text-start">add an
                     existing account</Link>
-                    <Link as="button" :href="route('logout')" @click.prevent method="post"
+                    <Link as="button" :href="route('logout')" method="post"
                         class="px-2 py-2 text-white text-sm bg-black hover:bg-[#d6d9db1f] text-start">log out @{{
                             user_auth.handle_name }}</Link>
                 </div>

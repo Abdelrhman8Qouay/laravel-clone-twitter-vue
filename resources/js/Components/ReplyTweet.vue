@@ -86,17 +86,17 @@
                         <MessageOutline class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                     </div>
                     <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                        formatNumber(RepliesNum)
+                        formatNumber(tweet.replies_count)
                     }}</span>
                 </div>
                 <Link as="button" method="post" :href="route('replies.likes', { reply_id: tweet.id })" preserve-scroll
-                    @click="has_liked = !has_liked, has_liked ? likesNum += 1 : likesNum -= 1"
-                    class="flex-1 flex justify-between items-center group" :title="has_liked ? 'liked' : 'like'">
+                    class="flex-1 flex justify-between items-center group" :title="tweet.liked ? 'liked' : 'like'">
                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#ff01733d]">
-                    <Heart :fillColor="has_liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
+                    <Heart :fillColor="tweet.liked ? '#e11d48' : '#000'" class="stroke-gray-500 group-hover:stroke-rose-600"
                         :size="16" />
                 </div>
-                <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{ formatNumber(likesNum)
+                <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-rose-600">{{
+                    formatNumber(tweet.likes_count)
                 }}</span>
                 </Link>
                 <div class="cursor-pointer flex-1 flex justify-between items-center group">
@@ -104,19 +104,18 @@
                         <ChartBar class="stroke-gray-500 group-hover:stroke-blue-500" fillColor="#000" :size="16" />
                     </div>
                     <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                        formatNumber(ViewedNum)
+                        formatNumber(tweet.viewed_count)
                     }}</span>
                 </div>
                 <Link as="button" method="post" :href="route('replies.bookmarks', { reply_id: tweet.id })" preserve-scroll
-                    @click="has_booked = !has_booked, has_booked ? BookmarksNum += 1 : BookmarksNum -= 1"
                     class="flex-1 flex justify-between items-center group"
-                    :title="has_booked ? 'marked' : 'add to bookmarks'">
+                    :title="tweet.marked ? 'marked' : 'add to bookmarks'">
                 <div class="rounded-full p-2 mr-1 group-hover:bg-[#01aaff3a]">
-                    <Bookmark :fillColor="has_booked ? '#3b82f6' : '#000'"
+                    <Bookmark :fillColor="tweet.marked ? '#3b82f6' : '#000'"
                         class="stroke-gray-500 group-hover:stroke-blue-500" :size="16" />
                 </div>
                 <span class="text-gray-400 text-start flex-1 text-sm group-hover:text-blue-500">{{
-                    formatNumber(BookmarksNum)
+                    formatNumber(tweet.bookmarks_count)
                 }}</span>
                 </Link>
             </div>
@@ -177,13 +176,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, toRefs, watchEffect, computed, onMounted } from "vue";
+import { ref, defineProps, toRefs, watchEffect, computed } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { formatNumber, betweenTime } from '@/Modules/utilities';
 
+// ---------- Icons
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
 import DotsHorizontal from "vue-material-design-icons/DotsHorizontal.vue";
-
 import EmoticonSadOutline from "vue-material-design-icons/EmoticonSadOutline.vue";
 import AccountRemove from "vue-material-design-icons/AccountRemove.vue";
 import AccountPlus from "vue-material-design-icons/AccountPlus.vue";
@@ -193,9 +192,7 @@ import BlockHelper from "vue-material-design-icons/BlockHelper.vue";
 import CodeLessThan from "vue-material-design-icons/CodeLessThan.vue";
 import AlertOctagonOutline from "vue-material-design-icons/AlertOctagonOutline.vue";
 import ChatRemoveOutline from "vue-material-design-icons/ChatRemoveOutline.vue";
-
 import Play from "vue-material-design-icons/Play.vue";
-
 import MessageOutline from "vue-material-design-icons/MessageOutline.vue";
 import RecycleVariant from "vue-material-design-icons/RecycleVariant.vue";
 import Heart from "vue-material-design-icons/Heart.vue";
@@ -213,38 +210,39 @@ const ifTweetMenu = ref(false);
 
 const replyEle = ref(null);
 // -------------------------- Part ------------------------------------------
-// Points Of User Tweeta
-const is_following = ref(false);
-const has_liked = ref(false);
-const has_booked = ref(false);
-const has_viewed = ref(false);
-onMounted(() => {
-    if (user_auth) {
-        is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
-        has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
-        has_booked.value = tweet.value.bookmarks.some(userBooks => userBooks.id === user_auth.id);
-        has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
-    } else {
-        is_following.value = false;
-        has_liked.value = false;
-        has_booked.value = false;
-        has_viewed.value = false;
-    }
-})
-// Live Numbers Of Points For The Tweeta
-const likesNum = ref(tweet.value.likes.length);
-const RepliesNum = ref(tweet.value.replies.length);
-const BookmarksNum = ref(tweet.value.bookmarks.length);
-const ViewedNum = ref(tweet.value.viewed.length);
+// // Points Of User Tweeta
+// const is_following = ref(false);
+// const has_liked = ref(false);
+// const has_booked = ref(false);
+// const has_viewed = ref(false);
+// onMounted(() => {
+//     if (user_auth) {
+//         is_following.value = tweet.value.user.followers.some(follower => follower.id === user_auth.id);
+//         has_liked.value = tweet.value.likes.some(userLike => userLike.id === user_auth.id);
+//         has_booked.value = tweet.value.bookmarks.some(userBooks => userBooks.id === user_auth.id);
+//         has_viewed.value = tweet.value.viewed.some(userViewed => userViewed.id === user_auth.id);
+//     } else {
+//         is_following.value = false;
+//         has_liked.value = false;
+//         has_booked.value = false;
+//         has_viewed.value = false;
+//     }
+// })
+// // Live Numbers Of Points For The Tweeta
+// const likesNum = ref(tweet.value.likes.length);
+// const RepliesNum = ref(tweet.value.replies.length);
+// const BookmarksNum = ref(tweet.value.bookmarks.length);
+// const ViewedNum = ref(tweet.value.viewed.length);
 // record the the movement of user when go inside post as viewed post
 watchEffect(() => {
     if (parent_scroll.value) {
         parent_scroll.value.addEventListener('scroll', (e) => {
             if (replyEle.value) {
                 if (replyEle.value.getBoundingClientRect().y >= -320 && replyEle.value.getBoundingClientRect().y <= 460) {
-                    if (!has_viewed.value) {
-                        router.post(route('replies.viewed', { reply_id: tweet.value.id }), {}, { preserveScroll: true });
+                    if (!tweet.value.vieweded) {
+                        router.post(route('replies.viewed', { reply_id: tweet.value.id }), {}, { preserveScroll: true, preserveState: true });
                         ViewedNum.value += 1;
+                        has_viewed.value = true;
                     }
                 }
             }

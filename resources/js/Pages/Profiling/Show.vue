@@ -216,7 +216,7 @@ import { Link, router, useForm, usePage } from "@inertiajs/vue3";
 
 import LayoutTwitter from "@/Layouts/LayoutTwitter.vue";
 import HeaderMain from "@/Components/HeaderMain.vue";
-import NewTweetaGround from "@/Components/NewTweetaGround.vue";
+import NewTweetaGround from "@/Components/NewTweet.vue";
 import Tweeta from "@/Components/Tweeta.vue";
 import LoaderFloating from "@/Components/LoaderFloating.vue";
 import InputFloating from "@/Components/InputFloating.vue";

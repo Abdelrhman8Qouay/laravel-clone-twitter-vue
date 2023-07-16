@@ -23,7 +23,15 @@ class TweetController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request) {
-        $tweets = Tweet::latest('created_at')->latest('id')->with('user.following', 'user.followers','likes','retweets','viewed')->withCount('replies')->paginate(PAGINATION_COUNT);
+        $tweets = Tweet::latest('created_at')->latest('id')->with('user.following', 'user.followers')->withCount( ['likes as liked' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'retweets as retweeted' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'bookmarks as marked' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'viewed as vieweded' => function($q) {
+            $q->where('user_id', auth()->id());
+        }, 'likes', 'retweets', 'bookmarks', 'viewed', 'replies'])->withCasts(['liked' => 'boolean', 'retweets' => 'boolean', 'bookmarks' => 'boolean', 'vieweded' => 'boolean'])->paginate(PAGINATION_COUNT);
 
         if($request->wantsJson()) {
             return $tweets;
@@ -106,10 +114,23 @@ class TweetController extends Controller
      */
     public function show(Request $request ,$name, $tweet_id) {
         // get all tweets
-        $tweeta = Tweet::with('user','user.following', 'user.followers', 'likes', 'retweets', 'bookmarks')->withCount('viewed')->get()->find($tweet_id);
+        $tweeta = Tweet::with('user','user.following', 'user.followers')->withCount( ['likes as liked' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'retweets as retweeted' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'bookmarks as marked' => function($q) {
+            $q->where('user_id', auth()->id());
+        }, 'likes', 'retweets', 'bookmarks', 'viewed'])->withCasts(['liked' => 'boolean', 'retweets' => 'boolean', 'bookmarks' => 'boolean'])->get()->find($tweet_id);
 
+        // dd($tweeta);
         // get all replies of this tweet
-        $replies = Reply::latest('created_at')->latest('id')->where('tweet_id', $tweet_id)->with('user','user.following', 'user.followers', 'tweet', 'replies','likes','bookmarks','viewed')->paginate(PAGINATION_COUNT);
+        $replies = Reply::latest('created_at')->latest('id')->where('tweet_id', $tweet_id)->with('user','user.following', 'user.followers')->withCount( ['likes as liked' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'bookmarks as marked' => function($q) {
+            $q->where('user_id', auth()->id());
+        },'viewed as vieweded' => function($q) {
+            $q->where('user_id', auth()->id());
+        }, 'likes', 'bookmarks', 'viewed', 'replies'])->withCasts(['liked' => 'boolean', 'bookmarks' => 'boolean', 'vieweded' => 'boolean'])->paginate(PAGINATION_COUNT);
         if($request->wantsJson()) {
             return $replies;
         }
