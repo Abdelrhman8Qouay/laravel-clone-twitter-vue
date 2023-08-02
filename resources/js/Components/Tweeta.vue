@@ -206,10 +206,6 @@ const { tweet, parent_scroll } = toRefs(props);
 const user_auth = usePage().props.auth.user;
 
 
-// watch(tweet, (newTweet) => {
-//     tweet.value = newTweet;
-// })
-
 const ifTweetMenu = ref(false);
 
 // -------------------------- Part ------------------------------------------

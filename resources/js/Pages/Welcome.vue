@@ -22,7 +22,7 @@
     </main>
 
     <!-- Loader Floating Section -->
-    <LoaderFloating v-show="loaderFloatShow" floating="true" />
+    <LoaderFloating v-show="loaderFloatShow" :showing="true" :floating="true" />
 
     <!-- Show Image Post Full Screen -->
     <ShowImgFullScreen v-if="openImgFullScreen" @clickself="(bol) => openImgFullScreen = bol" :imgData="imgPostFullSData" />

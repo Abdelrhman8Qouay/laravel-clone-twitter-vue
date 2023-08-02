@@ -161,10 +161,9 @@
                                     personalized timeline!</p>
                                 <!-- Buttons Create -->
                                 <div class="flex justify-center items-center py-1 px-4">
-                                    <Link :href="route('register')" as="button"
-                                        class="px-4 py-2 w-full mb-2 flex justify-center items-center bg-white text-black font-semibold rounded-full">
-                                    Create account
-                                    </Link>
+
+                                    <FullButton title="create account" tooltip="create new account" back-color="bg-white"
+                                        text-color="text-black" :is-button="false" :url="route('register')" />
                                 </div>
 
                                 <!-- Policies And More -->
@@ -228,11 +227,16 @@
 import { ref, onMounted, onBeforeMount, defineProps, toRefs, nextTick, defineEmits } from "vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 
-import LeftPages from "@/Layouts/LeftPages.vue";
-
-import SearchInput from "@/Components/SearchInput.vue";
+// Get Icons
 import DotsHorizontal from "vue-material-design-icons/DotsHorizontal.vue";
 import CheckDecagram from "vue-material-design-icons/CheckDecagram.vue";
+
+// Get Components
+import SearchInput from "@/Components/SearchInput.vue";
+import LeftPages from "@/Layouts/LeftPages.vue";
+import FullButton from '@/Components/FullButton.vue';
+
+
 
 // get all props
 const props = defineProps({
@@ -263,14 +267,5 @@ onBeforeMount(() => { hasLoaded.value = false })
     width: 0;
     height: 0;
     background: transparent;
-}
-
-.pUrl a {
-    text-decoration: none;
-    color: #1d9bf0;
-}
-
-.pUrl a:hover {
-    text-decoration: underline;
 }
 </style>

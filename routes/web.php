@@ -26,6 +26,10 @@ define('PAGINATION_COUNT', 10);
 
 // Note: {name} >> send handle name of user not the name of user.
 
+// -------------- Main Page Twitter ------------
+Route::get('/', function() {
+    return Inertia::render('WelcomeOnly');
+})->name('welcome');
 // -------------- User Tweets Pages & Store & Destroy ------------
 Route::get('/home', [\App\Http\Controllers\TweetController::class, 'index'])->name('tweets.index');
 // -------------- Tweet Show ------------

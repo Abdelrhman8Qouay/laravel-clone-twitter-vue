@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!float">
+    <div v-if="float" class="z-[25000]">
         <div :class="show ? 'top-8' : '-top-8'"
             class="fixed left-1/2 -translate-x-1/2 transition-all z-[25000] rounded-full">
             <div class="loader"></div>

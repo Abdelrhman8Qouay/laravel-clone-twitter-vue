@@ -12,14 +12,17 @@
                 </Link>
 
                 <!-- Url Lists -->
-                <Item title="Home" ico="Home" url="/home" :href="route('tweets.index')" preserve-state v-if="user_auth" />
-                <Item title="Explore" ico="Tag" url="/mag" />
-                <Item title="Verified" ico="Verified" url="/mag" v-if="user_auth" class="max-[512px]:hidden" />
-                <Item title="Bookmarks" ico="bookmark" url="/mag" v-if="user_auth" class="max-[512px]:hidden" />
-                <Item title="Profile" ico="Account" :url="'/profilee/' + user_auth.handle_name"
-                    :href="route('profiling.show', { name: user_auth.handle_name })" v-if="user_auth"
+                <Item title="Home" tooltip="Home" ico="Home" :url="route('tweets.index')" :no-title="false"
+                    v-if="user_auth" />
+                <Item title="Explore" tooltip="Explore" ico="Tag" :no-title="false" />
+                <Item title="Verified" tooltip="Verified" ico="Verified" :no-title="false" v-if="user_auth"
                     class="max-[512px]:hidden" />
-                <Item title="Settings" ico="Settings" url="/mag" />
+                <Item title="Bookmarks" tooltip="Bookmarks" ico="bookmark" :no-title="false" v-if="user_auth"
+                    class="max-[512px]:hidden" />
+                <Item title="Profile" tooltip="Profile" ico="Account" :no-title="false"
+                    :url="route('profiling.show', { name: user_auth.handle_name })" v-if="user_auth"
+                    class="max-[512px]:hidden" />
+                <Item title="Settings" tooltip="Settings" :no-title="false" ico="Settings" />
 
                 <!-- Tweet Button -->
                 <button @click="openNewTweetOverlay = true" type="button" v-if="user_auth"
